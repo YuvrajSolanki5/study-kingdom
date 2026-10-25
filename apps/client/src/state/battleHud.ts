@@ -28,6 +28,8 @@ interface BattleHud {
   selection: Selection;
   speed: number;
   paused: boolean;
+  /** Fast-forwarding to the result (skip or auto-battle): deploying is over. */
+  skipping: boolean;
   invalidAt: number;
   result: BattleResult | null;
   set(p: Partial<BattleHud>): void;
@@ -46,6 +48,7 @@ const initial = {
   selection: null as Selection,
   speed: 1,
   paused: false,
+  skipping: false,
   invalidAt: 0,
   result: null,
 };
@@ -62,4 +65,8 @@ export const battleBridge = {
   activateAbility: null as ((heroId: string) => void) | null,
   surrender: null as (() => void) | null,
   restartReplay: null as (() => void) | null,
+  /** Simulates the rest of the battle at once, with no further commands. */
+  skipToEnd: null as (() => void) | null,
+  /** Before the first deployment: deploys the whole army with autoPlan and skips to the result. */
+  autoBattle: null as (() => void) | null,
 };

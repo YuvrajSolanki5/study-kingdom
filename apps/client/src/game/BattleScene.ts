@@ -1,6 +1,7 @@
 import type { GameContent } from '@sk/content';
 import { getContent } from '@sk/content';
 import {
+  autoPlan,
   battleResult,
   canDeploy,
   createRuntime,
@@ -44,6 +45,10 @@ export interface BattleSceneData {
 
 const TICK_MS = 1000 / TPS;
 const FLY_HEIGHT = 34;
+/** Milliseconds of simulation per frame while skipping to the end. */
+const SKIP_BUDGET_MS = 12;
+/** Events that change which sprites exist; the rest are effects. */
+const KEPT_WHEN_SKIPPING = new Set<SimEvent['e']>(['spawn', 'bdie', 'udie', 'reveal']);
 const SPELL_COLORS: Record<string, number> = {
   thunder: 0xfff59d,
   mending: 0x86efac,
@@ -71,6 +76,8 @@ export class BattleScene extends Phaser.Scene {
   private hudAt = 0;
   /** Set once a surrender is issued: nothing may follow an `end` command. */
   private ending = false;
+  /** Fast-forwarding to the end: no more commands, effects and sounds skipped. */
+  private skipping = false;
 
   constructor() {
     super('battle');
@@ -90,6 +97,7 @@ export class BattleScene extends Phaser.Scene {
     this.started = data.replay;
     this.finished = false;
     this.ending = false;
+    this.skipping = false;
   }
 
   preload() {
@@ -146,6 +154,15 @@ export class BattleScene extends Phaser.Scene {
       this.ending = true;
     };
     battleBridge.restartReplay = () => this.scene.restart(this.cfg);
+    battleBridge.skipToEnd = () => this.skipToEnd();
+    battleBridge.autoBattle = () => {
+      if (this.started || this.finished || this.cfg.replay) return;
+      // The whole plan is recorded up front; nothing else may be issued after it.
+      this.started = true;
+      sfx('start');
+      this.commands.push(...autoPlan(this.rt.setup));
+      this.skipToEnd();
+    };
     if (!this.cfg.replay) {
       attachControls(
         this,
@@ -187,8 +204,14 @@ export class BattleScene extends Phaser.Scene {
       }
   }
 
+  private skipToEnd() {
+    if (!this.started || this.finished || this.cfg.replay) return;
+    this.skipping = true;
+    useBattleHud.getState().set({ skipping: true, paused: false });
+  }
+
   private issue(c: Command) {
-    if (this.finished || this.ending || this.cfg.replay) return;
+    if (this.finished || this.ending || this.skipping || this.cfg.replay) return;
     if (!this.started) {
       this.started = true;
       sfx('start');
@@ -243,18 +266,30 @@ export class BattleScene extends Phaser.Scene {
 
   override update(_time: number, delta: number) {
     const hud = useBattleHud.getState();
-    if (this.started && !this.finished && !hud.paused) {
+    if (this.skipping && !this.finished) {
+      // A frame-time budget only paces the fast-forward; the outcome is the same.
+      const until = performance.now() + SKIP_BUDGET_MS;
+      while (!this.rt.state.ended && performance.now() < until) this.step(true);
+      if (this.rt.state.ended) this.finish();
+    } else if (this.started && !this.finished && !hud.paused) {
       this.acc += Math.min(delta, 250) * hud.speed;
       while (this.acc >= TICK_MS && !this.rt.state.ended) {
-        for (const u of this.rt.state.units) if (!u.dead) this.prev.set(u.id, [u.x, u.y]);
-        stepTick(this.rt, this.commands);
-        this.handleEvents(this.rt.events);
+        this.step(false);
         this.acc -= TICK_MS;
       }
       if (this.rt.state.ended) this.finish();
     }
     this.render(this.finished ? 1 : this.acc / TICK_MS);
     if (performance.now() - this.hudAt > 100) this.publishHud(false);
+  }
+
+  private step(quiet: boolean) {
+    for (const u of this.rt.state.units) if (!u.dead) this.prev.set(u.id, [u.x, u.y]);
+    stepTick(this.rt, this.commands);
+    this.handleEvents(
+      quiet ? this.rt.events.filter((e) => KEPT_WHEN_SKIPPING.has(e.e)) : this.rt.events,
+      quiet,
+    );
   }
 
   private finish() {
@@ -309,7 +344,8 @@ export class BattleScene extends Phaser.Scene {
     return { sx: isoX(tx, ty), sy: isoY(tx, ty), d: (tx + ty) * 10 + 5 };
   }
 
-  private handleEvents(events: SimEvent[]) {
+  /** `quiet` drops effects and sounds, keeping only sprite bookkeeping. */
+  private handleEvents(events: SimEvent[], quiet = false) {
     const st = this.rt.state;
     for (const ev of events) {
       switch (ev.e) {
@@ -438,6 +474,7 @@ export class BattleScene extends Phaser.Scene {
           const info = this.rt.infos[ev.b]!;
           const img = this.bSprites[ev.b]!;
           if (info.isWall) img.setTexture(rubbleTexture(this, 1)).setAlpha(0.7);
+          else if (quiet) img.setTexture(rubbleTexture(this, info.size)).clearTint();
           else {
             img.setTexture(rubbleTexture(this, info.size)).clearTint();
             const puff = this.add
@@ -458,7 +495,10 @@ export class BattleScene extends Phaser.Scene {
         }
         case 'udie': {
           const img = this.uSprites.get(ev.u);
-          if (img) {
+          if (img && quiet) {
+            img.destroy();
+            this.uSprites.delete(ev.u);
+          } else if (img) {
             this.tweens.add({
               targets: img,
               alpha: 0,
@@ -481,7 +521,9 @@ export class BattleScene extends Phaser.Scene {
         case 'reveal': {
           const img = this.bSprites[ev.b]!;
           const full = img.scaleX;
-          img.setVisible(true).setScale(full * 0.2);
+          img.setVisible(true);
+          if (quiet) break;
+          img.setScale(full * 0.2);
           this.tweens.add({ targets: img, scale: full, duration: 300, ease: 'Back.Out' });
           break;
         }

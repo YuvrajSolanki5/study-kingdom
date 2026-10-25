@@ -73,10 +73,13 @@ export class VillageScene extends Phaser.Scene {
       if (s.placing !== prev.placing) this.setGhost(s.placing);
     });
     const redraw = () => this.sync();
+    const resize = () => this.cameras.main.setSize(this.scale.width, this.scale.height);
     const stop = () => {
       this.unsub?.();
       this.unsub = null;
       this.events.off(SPRITES_READY, redraw);
+      // The scale manager outlives the scene; a stale listener would throw in the game loop.
+      this.scale.off('resize', resize);
     };
     this.events.once('shutdown', stop);
     this.events.once('destroy', stop);
@@ -91,7 +94,7 @@ export class VillageScene extends Phaser.Scene {
     );
     // Upgrades and visits can need sprites that load after create().
     this.events.on(SPRITES_READY, redraw);
-    this.scale.on('resize', () => this.cameras.main.setSize(this.scale.width, this.scale.height));
+    this.scale.on('resize', resize);
     exposeScene(this, 'village');
   }
 

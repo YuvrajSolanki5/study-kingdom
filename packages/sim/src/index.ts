@@ -19,3 +19,4 @@ export {
   validateCommands,
   type ChunkResult,
 } from './run.ts';
+export { autoPlan } from './auto.ts';

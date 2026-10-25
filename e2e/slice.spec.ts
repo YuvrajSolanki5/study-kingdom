@@ -36,8 +36,9 @@ test('new player: register → study → upgrade → train → win a battle', as
   await page.getByRole('button', { name: 'Collect rewards' }).click();
   await expect(page.getByRole('heading', { name: 'Well studied!' })).toBeVisible();
   await page.getByRole('button', { name: 'Spend it in my kingdom' }).click();
+  // The HUD updates when the refreshed player view arrives.
+  await expect.poll(() => hudGold(page)).toBeGreaterThan(750);
   const afterStudy = await hudGold(page);
-  expect(afterStudy).toBeGreaterThan(750);
 
   // Upgrade the treasury (tile 25,20, size 3): select it, then upgrade.
   const t = await tileToPage(page, 26.5, 21.5);

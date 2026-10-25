@@ -36,9 +36,11 @@ export function BattleHud() {
           <div className="muted small">
             {battle.replay
               ? 'Replay'
-              : hud.started
-                ? 'Battle'
-                : 'Scout the base, then tap the green area to deploy'}
+              : hud.skipping
+                ? 'Simulating to the end…'
+                : hud.started
+                  ? 'Battle'
+                  : 'Scout the base, then tap the green area to deploy, or auto-battle'}
           </div>
         </div>
         <div className="battle-score">
@@ -132,14 +134,48 @@ export function BattleHud() {
               </button>
             );
           })}
-          <Button
-            tone="danger"
-            className="end-btn"
-            onClick={() => battleBridge.surrender?.()}
-            disabled={hud.ended}
-          >
-            {hud.started ? 'End battle' : 'Retreat'}
-          </Button>
+          <div className="tray-controls">
+            {!hud.started ? (
+              <Button
+                tone="primary"
+                title="Deploy the whole army automatically and see the result at once"
+                onClick={() => battleBridge.autoBattle?.()}
+              >
+                ⚡ Auto-battle
+              </Button>
+            ) : (
+              <>
+                <div className="row speed" role="group" aria-label="Battle speed">
+                  {[1, 2, 4].map((s) => (
+                    <Button
+                      key={s}
+                      tone={hud.speed === s ? 'primary' : 'default'}
+                      aria-pressed={hud.speed === s}
+                      disabled={hud.ended || hud.skipping}
+                      onClick={() => hud.set({ speed: s })}
+                    >
+                      {s}×
+                    </Button>
+                  ))}
+                </div>
+                <Button
+                  title="Simulate the rest of the battle now; nothing more can be deployed"
+                  disabled={hud.ended || hud.skipping}
+                  onClick={() => battleBridge.skipToEnd?.()}
+                >
+                  ⏭ Skip to end
+                </Button>
+              </>
+            )}
+            <Button
+              tone="danger"
+              className="end-btn"
+              onClick={() => battleBridge.surrender?.()}
+              disabled={hud.ended || hud.skipping}
+            >
+              {hud.started ? 'End battle' : 'Retreat'}
+            </Button>
+          </div>
         </footer>
       )}
       {battle.phase === 'submitting' || battle.phase === 'done' ? <ResultModal /> : null}

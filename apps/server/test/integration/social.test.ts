@@ -150,13 +150,58 @@ it('ranked matching freezes a snapshot and applies capped rewards exactly once',
     action: { type: 'train', kind: 'troops', id: 'swordsman', count: 5 },
   });
   h.clock.advance(60000);
+  // A chosen target that cannot be raided again says why (shield or daily cooldown).
   expect(
     (await a.post('/api/battles', { requestId: rid(), kind: 'ranked', target: bv.profile.userId })).status,
-  ).toBe(404);
+  ).toBe(409);
   expect(
     (await b.get('/api/battles')).body.battles.some(
       (r: { attackerId: string }) => r.attackerId === av.profile.userId,
     ),
   ).toBe(true);
   expect(await h.admin`select * from game.ledger_mismatches`).toHaveLength(0);
+});
+it('friends can attack each other directly: friendly for practice, ranked for trophies', async () => {
+  const { a, b, av } = await pair(),
+    stranger = await signedInClient(h);
+  const armyOf = async () => (await b.get('/api/player')).body.state.army.troops.swordsman;
+  const before = await armyOf();
+  // Friendly: no challenge needed, nothing is used up or won.
+  const friendly = await b.post('/api/battles', {
+    requestId: rid(),
+    kind: 'friendly',
+    target: av.profile.userId,
+  });
+  expect(friendly.status).toBe(200);
+  expect(friendly.body.battle.kind).toBe('friendly');
+  const done = await b.post(`/api/battles/${friendly.body.battle.id}/submit`, { commands: deploy });
+  expect(done.body.battle.status).toBe('settled');
+  expect(await armyOf()).toBe(before);
+  expect((await b.get('/api/player')).body.profile.trophies).toBe(0);
+  const note = (await a.get('/api/social/notifications')).body.notifications;
+  expect(note.some((n: { message: string }) => /practised on your village/.test(n.message))).toBe(true);
+  // Only friends.
+  const nope = await stranger.post('/api/battles', {
+    requestId: rid(),
+    kind: 'friendly',
+    target: av.profile.userId,
+  });
+  expect(nope.status).toBe(403);
+  // Ranked against a chosen friend uses the army and moves trophies.
+  const ranked = await b.post('/api/battles', {
+    requestId: rid(),
+    kind: 'ranked',
+    target: av.profile.userId,
+  });
+  expect(ranked.status).toBe(200);
+  expect(ranked.body.battle.defenderId ?? av.profile.userId).toBe(av.profile.userId);
+  const five = deploy.slice(0, 5);
+  const raided = await b.post(`/api/battles/${ranked.body.battle.id}/submit`, { commands: five });
+  expect(raided.body.battle.status).toBe('settled');
+  expect(await armyOf()).toBe(before - 5);
+  // The usual once-a-day limit per target applies, with a reason the player can act on.
+  const again = await b.post('/api/battles', { requestId: rid(), kind: 'ranked', target: av.profile.userId });
+  expect(again.status).toBe(409);
+  // A big raid shields the defender, which is checked before the daily cooldown.
+  expect(again.body.error.message).toMatch(/Alice is shielded|raided Alice/);
 });

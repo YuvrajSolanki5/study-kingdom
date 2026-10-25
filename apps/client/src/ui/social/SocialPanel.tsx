@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { LeagueStanding, SocialView } from '@sk/shared';
 import { battles, social } from '../../api/endpoints.ts';
 import { useGame } from '../../state/store.ts';
-import { Button, Panel } from '../common.tsx';
+import { Button, Modal, Panel } from '../common.tsx';
 
 export function SocialPanel() {
   const view = useGame((s) => s.view)!;
@@ -13,6 +13,7 @@ export function SocialPanel() {
   const [replayToken, setReplayToken] = useState('');
   const [scores, setScores] = useState<{ name: string; rows: LeagueStanding[] } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [target, setTarget] = useState<{ userId: string; name: string } | null>(null);
   const toast = useGame((s) => s.toast);
   const load = () => social.view().then(setData);
   useEffect(() => {
@@ -20,23 +21,26 @@ export function SocialPanel() {
     const t = setInterval(() => void load().catch(() => undefined), 30000);
     return () => clearInterval(t);
   }, [toast]);
-  async function run(fn: () => Promise<unknown>) {
+  /** Runs an action, reporting failure as a toast. Resolves true when it succeeded. */
+  async function run(fn: () => Promise<unknown>): Promise<boolean> {
     setBusy(true);
     try {
       await fn();
       await load();
+      return true;
     } catch (e) {
       toast(e instanceof Error ? e.message : 'Could not complete action', 'bad');
+      return false;
     } finally {
       setBusy(false);
     }
   }
-  async function attack(kind: 'friendly' | 'ranked', target?: string) {
+  async function attack(kind: 'friendly' | 'ranked', target?: string, title?: string) {
     const r = await battles.start(kind, target);
     useGame.getState().setBattle({
       id: r.battle.id,
       kind,
-      title: kind === 'ranked' ? 'Ranked raid' : 'Friendly challenge',
+      title: title ?? (kind === 'ranked' ? 'Ranked raid' : 'Friendly challenge'),
       setup: r.setup,
       phase: 'scouting',
       replay: false,
@@ -96,7 +100,18 @@ export function SocialPanel() {
                       >
                         Visit
                       </Button>
-                      <Button busy={busy} onClick={() => void run(() => social.challenge(f.userId))}>
+                      <Button
+                        tone="primary"
+                        busy={busy}
+                        onClick={() => setTarget({ userId: f.userId, name: f.displayName })}
+                      >
+                        Attack
+                      </Button>
+                      <Button
+                        busy={busy}
+                        title="Invite them to attack your village"
+                        onClick={() => void run(() => social.challenge(f.userId))}
+                      >
                         Challenge
                       </Button>
                     </>
@@ -143,6 +158,51 @@ export function SocialPanel() {
                 </p>
               ))}
             </details>
+          ) : null}
+          {target ? (
+            <Modal label={`Attack ${target.name}`} onClose={() => setTarget(null)}>
+              <h2>Attack {target.name}</h2>
+              <div className="attack-choice">
+                <div className="stack">
+                  <strong>Friendly battle</strong>
+                  <span className="small muted">
+                    Practise on their village any time. Your army comes back; no trophies or loot change
+                    hands.
+                  </span>
+                  <Button
+                    tone="primary"
+                    busy={busy}
+                    onClick={() =>
+                      void run(() =>
+                        attack('friendly', target.userId, `Friendly battle · ${target.name}`),
+                      ).then((ok) => ok && setTarget(null))
+                    }
+                  >
+                    Friendly battle
+                  </Button>
+                </div>
+                <div className="stack">
+                  <strong>Ranked raid</strong>
+                  <span className="small muted">
+                    For real trophies and the daily win bonus. Uses your army, and works when your Keeps are
+                    close in level and trophies. Once a day per friend.
+                  </span>
+                  <Button
+                    busy={busy}
+                    onClick={() =>
+                      void run(() => attack('ranked', target.userId, `Ranked raid · ${target.name}`)).then(
+                        (ok) => ok && setTarget(null),
+                      )
+                    }
+                  >
+                    Ranked raid
+                  </Button>
+                </div>
+              </div>
+              <Button tone="ghost" onClick={() => setTarget(null)}>
+                Cancel
+              </Button>
+            </Modal>
           ) : null}
           <h3>Challenges</h3>
           <ul className="list">
