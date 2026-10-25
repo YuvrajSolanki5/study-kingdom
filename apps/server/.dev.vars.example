@@ -1,0 +1,10 @@
+# Copy to apps/server/.dev.vars for `npm run dev` (wrangler dev). Never commit .dev.vars.
+ENVIRONMENT=development
+VERIFIER=inline
+SITE_URL=http://localhost:5173
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:1420,tauri://localhost,http://tauri.localhost
+SUPABASE_URL=http://127.0.0.1:54321
+# From `npx supabase status` (publishable / anon key)
+SUPABASE_PUBLISHABLE_KEY=
+# Local Supabase database (game_api role; see docs/setup.md) or postgres superuser for quick starts
+DATABASE_URL=postgresql://game_api:dev-only-password@127.0.0.1:54322/postgres

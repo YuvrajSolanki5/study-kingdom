@@ -1,0 +1,45 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "study-kingdom",
+  "account_id": "6584dd7dc535428d5ee992668aa6ff30",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  // Hyperdrive verifies Supabase's private CA and hostname. No SQL result cache:
+  // balances, sessions and war deadlines must always read current rows.
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "56df18a46755476e8af26bfd4311c2b1",
+      "localConnectionString": "postgres://game_api:dev-only-password@127.0.0.1:54322/postgres",
+    },
+  ],
+  // The web client is served from Workers Static Assets (free, unlimited
+  // requests). Only /api/* invokes the Worker.
+  "assets": {
+    "directory": "../client/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
+  },
+  // Every 2 minutes: close stale study sessions, settle expired battles, war
+  // phase transitions. Daily: housekeeping + Supabase keep-alive.
+  "triggers": { "crons": ["*/2 * * * *", "0 3 * * *"] },
+  "observability": { "enabled": true },
+  "limits": {},
+  "vars": {
+    "ENVIRONMENT": "production",
+    "APP_VERSION": "0.1.0",
+    "VERIFIER": "edge",
+    // Set these to your deployment (non-secret). See docs/setup.md.
+    "SITE_URL": "https://study-kingdom.yuvraj-658.workers.dev",
+    "SUPABASE_URL": "https://zybsydbylutyuroqpbiy.supabase.co",
+    "ALLOWED_ORIGINS": "tauri://localhost,http://tauri.localhost",
+    "DB_PREPARE": "true",
+  },
+  // Secrets (wrangler secret put): SUPABASE_PUBLISHABLE_KEY, DATABASE_URL (when
+  // not using Hyperdrive), VERIFY_FUNCTION_URL, VERIFY_SHARED_SECRET,
+  // optionally SUPABASE_JWT_SECRET for legacy projects.
+}

@@ -1,0 +1,58 @@
+name: Encrypted database backup
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * *'
+permissions:
+  contents: read
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check backup configuration
+        id: configured
+        env:
+          BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+        run: |
+          node --input-type=module - <<'JS'
+          import {appendFileSync} from 'node:fs';
+          const ready=!!process.env.BACKUP_KEY&&!!process.env.BACKUP_DATABASE_URL;
+          appendFileSync(process.env.GITHUB_OUTPUT,`ready=${ready}\n`);
+          console.log(ready?'Backup configured':'Backup awaits repository secrets');
+          JS
+      - uses: actions/checkout@v4
+        if: steps.configured.outputs.ready == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.configured.outputs.ready == 'true'
+        with:
+          node-version: 24
+      - name: Prepare private backup key and PostgreSQL tools
+        if: steps.configured.outputs.ready == 'true'
+        env:
+          BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
+        run: |
+          node --input-type=module - <<'JS'
+          import {writeFileSync} from 'node:fs';
+          if(!process.env.BACKUP_KEY || process.env.BACKUP_KEY.length<32)throw new Error('Configure BACKUP_KEY (at least 32 random characters)');
+          writeFileSync('/tmp/sk-backup.key',process.env.BACKUP_KEY,{mode:0o600});
+          JS
+          docker run -d --name sk-pgtools -v "$PWD/scripts/certs:/certs:ro" --entrypoint sleep postgres:17-alpine infinity
+      - name: Create authenticated encrypted archive
+        if: steps.configured.outputs.ready == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          BACKUP_KEY_FILE: /tmp/sk-backup.key
+          PGTOOLS_CONTAINER: sk-pgtools
+        run: bash scripts/db/backup.sh backups/study-kingdom.skbak
+      - uses: actions/upload-artifact@v4
+        if: steps.configured.outputs.ready == 'true'
+        with:
+          name: encrypted-database-${{ github.run_id }}
+          path: backups/*.skbak
+          retention-days: 7
+          if-no-files-found: error
+      - name: Remove local key
+        if: always()
+        run: rm -f /tmp/sk-backup.key

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Study Kingdom",
+  "version": "0.1.0",
+  "identifier": "app.studykingdom.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev -w @sk/client",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build:desktop -w @sk/client",
+    "frontendDist": "../../client/dist-desktop"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Study Kingdom",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 960,
+        "minHeight": 640,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self'; connect-src 'self' ipc: http://ipc.localhost https://*.workers.dev http://localhost:8787 http://127.0.0.1:8787; worker-src 'self' blob:; object-src 'none'; base-uri 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "createUpdaterArtifacts": true,
+    "category": "Education",
+    "shortDescription": "Study to build. Build to conquer.",
+    "longDescription": "A village strategy game powered by study sessions.",
+    "copyright": "© Study Kingdom",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "12.3",
+      "signingIdentity": "-",
+      "dmg": {
+        "windowSize": { "width": 620, "height": 400 },
+        "appPosition": { "x": 170, "y": 190 },
+        "applicationFolderPosition": { "x": 450, "y": 190 }
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "REPLACED_BY_RELEASE_CONFIG",
+      "endpoints": ["https://github.com/OWNER/REPO/releases/latest/download/latest.json"]
+    }
+  }
+}

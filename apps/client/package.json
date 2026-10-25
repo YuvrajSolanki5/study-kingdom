@@ -1,0 +1,31 @@
+{
+  "name": "@sk/client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:desktop": "vite build --mode desktop",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@sk/content": "0.1.0",
+    "@sk/rules": "0.1.0",
+    "@sk/shared": "0.1.0",
+    "@sk/sim": "0.1.0",
+    "@tauri-apps/api": "2.12.4",
+    "@tauri-apps/plugin-process": "2.4.0",
+    "@tauri-apps/plugin-updater": "2.14.0",
+    "phaser": "4.2.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zustand": "5.0.16"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "vite": "8.3.5"
+  }
+}

@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-desktop
+.wrangler
+apps/desktop/src-tauri/target
+apps/desktop/src-tauri/gen
+supabase/.temp
+package-lock.json
+*.md
+supabase/templates
+release-out
+test-results
+apps/desktop/src-tauri/target

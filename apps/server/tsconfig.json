@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../node_modules/.tsc/apps/server",
+    "rootDir": "../..",
+    "types": ["@cloudflare/workers-types"],
+    "lib": ["ES2023"]
+  },
+  "references": [
+    { "path": "../../packages/content" },
+    { "path": "../../packages/sim" },
+    { "path": "../../packages/rules" },
+    { "path": "../../packages/shared" }
+  ],
+  "include": ["src"]
+}

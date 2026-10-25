@@ -1,0 +1,8 @@
+{
+  "$comment": "Public (non-secret) release settings shared by local and CI builds. See docs/release.md.",
+  "githubRepo": "YuvrajSolanki5/study-kingdom",
+  "apiUrl": "https://study-kingdom.yuvraj-658.workers.dev",
+  "updaterPubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDA1NUQ2QjRFQUZFOTE0OTEKUldTUkZPbXZUbXRkQmRXL3Yrc2lSOGRXM3JVRS9NVzdqMncwWFVzeFhzdldxalY5UjdwdGRPVXgK",
+  "bundleIdentifier": "app.studykingdom.desktop",
+  "targets": ["aarch64-apple-darwin", "x86_64-apple-darwin"]
+}

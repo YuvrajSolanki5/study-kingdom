@@ -1,0 +1,121 @@
+{
+  "c01_bandit_camp": {
+    "stars": 3,
+    "destructionPercent": 100,
+    "hqDestroyed": true,
+    "ticks": 298,
+    "endReason": "destroyed",
+    "destroyedBuildings": 4,
+    "totalBuildings": 4,
+    "deployed": {
+      "swordsman": 20
+    },
+    "lost": {
+      "swordsman": 3
+    },
+    "spellsUsed": {},
+    "troopsUsed": {
+      "swordsman": 20
+    },
+    "siegeUsed": {},
+    "heroesUsed": [],
+    "reinforcementsUsed": false,
+    "heroHealth": {},
+    "hash": "01dab77e"
+  },
+  "c02_riverside_watch": {
+    "stars": 3,
+    "destructionPercent": 100,
+    "hqDestroyed": true,
+    "ticks": 440,
+    "endReason": "destroyed",
+    "destroyedBuildings": 7,
+    "totalBuildings": 7,
+    "deployed": {
+      "swordsman": 20
+    },
+    "lost": {
+      "swordsman": 8
+    },
+    "spellsUsed": {},
+    "troopsUsed": {
+      "swordsman": 20
+    },
+    "siegeUsed": {},
+    "heroesUsed": [],
+    "reinforcementsUsed": false,
+    "heroHealth": {},
+    "hash": "bd5320c5"
+  },
+  "c03_stone_ford": {
+    "stars": 0,
+    "destructionPercent": 14,
+    "hqDestroyed": false,
+    "ticks": 466,
+    "endReason": "army",
+    "destroyedBuildings": 1,
+    "totalBuildings": 7,
+    "deployed": {
+      "swordsman": 20
+    },
+    "lost": {
+      "swordsman": 20
+    },
+    "spellsUsed": {},
+    "troopsUsed": {
+      "swordsman": 20
+    },
+    "siegeUsed": {},
+    "heroesUsed": [],
+    "reinforcementsUsed": false,
+    "heroHealth": {},
+    "hash": "a905e520"
+  },
+  "hq10_combined_arms": {
+    "stars": 3,
+    "destructionPercent": 100,
+    "hqDestroyed": true,
+    "ticks": 250,
+    "endReason": "destroyed",
+    "destroyedBuildings": 10,
+    "totalBuildings": 10,
+    "deployed": {
+      "swordsman": 80,
+      "warlord": 1,
+      "sage": 1,
+      "battering_ram": 1,
+      "archer": 40,
+      "necromancer": 2,
+      "drake": 2,
+      "mender": 2,
+      "bulwark": 4
+    },
+    "lost": {
+      "swordsman": 15,
+      "battering_ram": 1,
+      "archer": 5
+    },
+    "spellsUsed": {
+      "thunder": 1,
+      "fury": 1,
+      "mending": 1
+    },
+    "troopsUsed": {
+      "swordsman": 80,
+      "archer": 40,
+      "necromancer": 2,
+      "drake": 2,
+      "mender": 2
+    },
+    "siegeUsed": {
+      "battering_ram": 1
+    },
+    "heroesUsed": ["warlord", "sage"],
+    "reinforcementsUsed": true,
+    "heroHealth": {
+      "warlord": 100,
+      "sage": 100
+    },
+    "hash": "abc4a366"
+  }
+}

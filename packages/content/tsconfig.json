@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../node_modules/.tsc/packages/content",
+    "rootDir": ".",
+    "types": []
+  },
+
+  "include": ["src", "test"]
+}

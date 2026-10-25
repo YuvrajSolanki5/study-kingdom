@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../node_modules/.tsc/packages/shared",
+    "rootDir": ".",
+    "types": []
+  },
+  "references": [{ "path": "../content" }, { "path": "../rules" }, { "path": "../sim" }],
+  "include": ["src", "test"]
+}

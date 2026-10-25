@@ -1,0 +1,14 @@
+{
+  "name": "@sk/rules",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "sideEffects": false,
+  "dependencies": {
+    "@sk/content": "0.1.0",
+    "@sk/sim": "0.1.0"
+  }
+}

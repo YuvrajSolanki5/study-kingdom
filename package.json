@@ -1,0 +1,58 @@
+{
+  "name": "study-kingdom",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "npm run dev -w @sk/server",
+    "dev:client": "npm run dev -w @sk/client",
+    "dev:desktop": "npm run tauri:dev -w @sk/desktop",
+    "build": "npm run build -w @sk/client && npm run build -w @sk/server",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -b tsconfig.json",
+    "test": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:all": "vitest run",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts",
+    "bench:sim": "node --experimental-strip-types scripts/bench-sim.ts",
+    "econ:sim": "node --experimental-strip-types scripts/economy-sim.ts",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:push": "supabase db push",
+    "deploy": "npm run build && npm run deploy -w @sk/server",
+    "release:version": "node scripts/release/bump-version.mjs",
+    "release:local": "bash scripts/release/local-release.sh",
+    "deploy:edge": "node scripts/build-edge.mjs && supabase functions deploy verify-battle --no-verify-jwt",
+    "test:edge": "vitest run --project edge",
+    "balance:combat": "node --experimental-strip-types scripts/balance-combat.ts",
+    "test:backup": "node --experimental-strip-types scripts/db/test-backup.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.64.1",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "supabase": "2.122.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.0",
+    "vitest": "^4.1.12"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "workerd@1.20261019.1": true,
+    "fsevents@2.3.3": true
+  }
+}
