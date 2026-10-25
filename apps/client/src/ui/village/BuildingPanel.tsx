@@ -44,7 +44,7 @@ export function BuildingPanel() {
   const blocked = !next
     ? 'Max level'
     : next.hq > hq
-      ? `Requires Headquarters ${next.hq}`
+      ? `Requires Keep ${next.hq}`
       : !canAfford(agg, next.cost)
         ? 'Not enough resources — study to earn more'
         : next.seconds > 0 && freeBuilder(view.state) < 0

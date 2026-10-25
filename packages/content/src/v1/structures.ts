@@ -37,7 +37,7 @@ const trap =
 export const structures: StructureDef[] = [
   {
     id: 'headquarters',
-    name: 'Headquarters',
+    name: "Scholar's Keep",
     description: 'The heart of your kingdom. Upgrading it unlocks new buildings, levels and troops.',
     category: 'core',
     size: 4,
@@ -58,7 +58,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'treasury',
-    name: 'Treasury',
+    name: 'Gilded Vault',
     description: 'Stores the Gold and Essence you earn from studying.',
     category: 'storage',
     size: 3,
@@ -79,7 +79,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'barracks',
-    name: 'Barracks',
+    name: 'Muster Hall',
     description: 'Trains troops. Each level unlocks a new troop type.',
     category: 'army',
     size: 3,
@@ -108,7 +108,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'army_camp',
-    name: 'Army Camp',
+    name: 'Bonfire Camp',
     description: 'Houses your trained troops. More and larger camps mean a bigger army.',
     category: 'army',
     size: 4,
@@ -125,7 +125,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'research_library',
-    name: 'Research Library',
+    name: 'Lorehouse',
     description: 'Researches stronger troops and spells with Essence, and unlocks new spells.',
     category: 'army',
     size: 3,
@@ -141,7 +141,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'clan_hall',
-    name: 'Clan Hall',
+    name: 'Banner Hall',
     description: 'Holds troops donated by your clan. They join your attacks and defend your village.',
     category: 'army',
     size: 3,
@@ -158,8 +158,8 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'workshop',
-    name: 'Workshop',
-    description: 'Builds the Battering Ram, which smashes a path to the enemy Headquarters.',
+    name: 'Tinker Forge',
+    description: 'Builds the Gatebreaker, which smashes a path to the enemy Keep.',
     category: 'army',
     size: 3,
     maxCount: [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
@@ -169,7 +169,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'builder_lodge',
-    name: 'Builder Lodge',
+    name: "Builder's Nook",
     description: 'Home of one builder. Each builder works on one upgrade at a time.',
     category: 'utility',
     size: 2,
@@ -181,7 +181,7 @@ export const structures: StructureDef[] = [
   // ---------------------------------------------------------------- defences
   {
     id: 'bolt_thrower',
-    name: 'Bolt Thrower',
+    name: 'Boltcaster',
     description: 'Fires heavy bolts at a single ground target.',
     category: 'defense',
     size: 3,
@@ -198,7 +198,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'watchtower',
-    name: 'Watchtower',
+    name: 'Hawk Roost',
     description: 'Archers on a tall tower hit ground and air units at long range.',
     category: 'defense',
     size: 3,
@@ -215,7 +215,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'catapult',
-    name: 'Catapult',
+    name: 'Boulder Lobber',
     description: 'Lobs boulders that splash groups of ground troops. Cannot hit anything close.',
     category: 'defense',
     size: 3,
@@ -235,7 +235,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'skyspear',
-    name: 'Skyspear',
+    name: 'Sky Harpoon',
     description: 'Hurls spears at flying units only — deadly to anything in the air.',
     category: 'defense',
     size: 3,
@@ -252,7 +252,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'arcane_spire',
-    name: 'Arcane Spire',
+    name: 'Runeglass Spire',
     description: 'Arcane blasts splash ground and air units at short range.',
     category: 'defense',
     size: 3,
@@ -272,7 +272,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'storm_totem',
-    name: 'Storm Totem',
+    name: 'Stormcaller Totem',
     description: 'Hidden until attackers come close, then zaps ground and air units rapidly.',
     category: 'defense',
     size: 2,
@@ -289,7 +289,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'repeater',
-    name: 'Repeater',
+    name: 'Rattle Arbalest',
     description: 'A rapid-fire crossbow with the longest reach in the kingdom.',
     category: 'defense',
     size: 3,
@@ -306,7 +306,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'ember_tower',
-    name: 'Ember Tower',
+    name: 'Cinder Pyre',
     description: 'Its beam grows hotter the longer it stays on one target. Melts tanks and heroes.',
     category: 'defense',
     size: 2,
@@ -331,7 +331,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'wall',
-    name: 'Wall',
+    name: 'Rampart',
     description: 'Slows ground attackers, who must break through or find a way around.',
     category: 'wall',
     size: 1,
@@ -348,7 +348,7 @@ export const structures: StructureDef[] = [
   // ------------------------------------------------------------------- traps
   {
     id: 'blast_mine',
-    name: 'Blast Mine',
+    name: 'Boom Barrel',
     description: 'Hidden. Explodes under groups of ground troops.',
     category: 'trap',
     size: 1,
@@ -365,7 +365,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'spring_snare',
-    name: 'Spring Snare',
+    name: 'Bounce Plate',
     description: 'Hidden. Flings ground troops out of the battle.',
     category: 'trap',
     size: 1,
@@ -382,7 +382,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'sky_mine',
-    name: 'Sky Mine',
+    name: 'Puff Mine',
     description: 'Hidden. Bursts among flying units.',
     category: 'trap',
     size: 1,
@@ -399,7 +399,7 @@ export const structures: StructureDef[] = [
   },
   {
     id: 'seeker_mine',
-    name: 'Seeker Mine',
+    name: 'Homing Thorn',
     description: 'Hidden. Locks onto one flying unit and deals massive damage.',
     category: 'trap',
     size: 1,

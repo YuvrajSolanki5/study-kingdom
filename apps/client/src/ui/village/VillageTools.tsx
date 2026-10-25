@@ -2,8 +2,9 @@ import { maxCountAt, type StructureDef } from '@sk/content';
 import { canAfford, countBuildings, freeBuilder, hqLevel } from '@sk/rules';
 import { useEffect, useState } from 'react';
 import { contentOf, useGame } from '../../state/store.ts';
-import { Button, CostView, Panel } from '../common.tsx';
+import { buildingArtUrl, Button, CostView, Icon, Panel } from '../common.tsx';
 import { fmtDuration } from '../format.ts';
+import { Onboarding } from '../Onboarding.tsx';
 
 export function VillageTools() {
   const [shop, setShop] = useState(false);
@@ -25,24 +26,30 @@ export function VillageTools() {
 
   return (
     <>
-      <div className="village-tools">
-        {placing ? (
-          <div className="tool-hint">
-            {placing === 'wall' ? 'Drag across free tiles to place walls.' : 'Tap a free spot to place it.'}
-            <Button tone="ghost" onClick={() => setPlacing(null)}>
-              {placing === 'wall' ? 'Done' : 'Cancel'}
-            </Button>
-          </div>
-        ) : editMode ? (
-          <LayoutBar onDone={() => setEditMode(false)} />
-        ) : (
-          <>
-            <Button tone="gold" onClick={() => setShop(true)}>
-              🛠️ Build
-            </Button>
-            <Button onClick={() => setEditMode(true)}>✋ Edit layout</Button>
-          </>
-        )}
+      {/* The guide stacks above the tools so neither covers the other. */}
+      <div className="village-dock">
+        <Onboarding />
+        <div className="village-tools">
+          {placing ? (
+            <div className="tool-hint">
+              {placing === 'wall' ? 'Drag across free tiles to place walls.' : 'Tap a free spot to place it.'}
+              <Button tone="ghost" onClick={() => setPlacing(null)}>
+                {placing === 'wall' ? 'Done' : 'Cancel'}
+              </Button>
+            </div>
+          ) : editMode ? (
+            <LayoutBar onDone={() => setEditMode(false)} />
+          ) : (
+            <>
+              <Button tone="gold" className="big" onClick={() => setShop(true)}>
+                <Icon name="hammer" size={26} fallback="🛠️" /> Build
+              </Button>
+              <Button className="big" onClick={() => setEditMode(true)}>
+                ✋ Edit layout
+              </Button>
+            </>
+          )}
+        </div>
       </div>
       {shop ? (
         <ShopPanel onClose={() => setShop(false)} onPick={(id) => (setShop(false), setPlacing(id))} />
@@ -89,6 +96,11 @@ function LayoutBar({ onDone }: { onDone: () => void }) {
   );
 }
 
+function ShopArt({ defId }: { defId: string }) {
+  const url = buildingArtUrl(defId);
+  return url ? <img className="shop-art" src={url} alt="" aria-hidden draggable={false} /> : null;
+}
+
 function ShopPanel({ onClose, onPick }: { onClose: () => void; onPick: (id: string) => void }) {
   const view = useGame((s) => s.view)!;
   const content = contentOf(view);
@@ -121,11 +133,12 @@ function ShopPanel({ onClose, onPick }: { onClose: () => void; onPick: (id: stri
                 const disabled = locked || full || !affordable || (needsBuilder && noBuilder);
                 return (
                   <button key={d.id} className="shop-item" disabled={disabled} onClick={() => onPick(d.id)}>
+                    <ShopArt defId={d.id} />
                     <strong>{d.name}</strong>
                     <span className="muted small">{d.description}</span>
                     <span className="shop-meta">
                       {locked ? (
-                        <span className="tag">HQ {first.hq}</span>
+                        <span className="tag">Keep {first.hq}</span>
                       ) : (
                         <>
                           <span className="tag">

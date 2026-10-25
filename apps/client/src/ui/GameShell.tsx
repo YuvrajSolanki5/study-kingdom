@@ -1,4 +1,3 @@
-import { Onboarding } from './Onboarding.tsx';
 import { social } from '../api/endpoints.ts';
 import { ClanPanel } from './clan/ClanPanel.tsx';
 import { SocialPanel } from './social/SocialPanel.tsx';
@@ -66,7 +65,6 @@ export function GameShell() {
         <>
           <Hud />
           <BreakBanner />
-          <Onboarding />
           <main className="stage">
             {visit ? (
               <div className="visit-banner">

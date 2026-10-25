@@ -302,7 +302,7 @@ export function ClanPanel() {
                       .map((r) => (
                         <li key={r.userId} className="row between">
                           <span>
-                            {r.position}. {r.displayName} · HQ {r.hqLevel}
+                            {r.position}. {r.displayName} · Keep {r.hqLevel}
                           </span>
                           {w.status === 'battle' && w.roster.some((r) => r.userId === view.profile.userId) ? (
                             <Button

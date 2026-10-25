@@ -28,3 +28,6 @@ export function fmtMinutes(seconds: number): string {
   if (m >= 60) return `${Math.floor(m / 60)}h ${m % 60}m`;
   return `${m} min`;
 }
+
+/** Required by Supercell's permission to use its fan kit art (docs/licensing.md). */
+export const UNOFFICIAL_NOTICE = 'This material is unofficial and is not endorsed by Supercell.';

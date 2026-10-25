@@ -3,6 +3,7 @@ import { auth } from '../../api/endpoints.ts';
 import { api, ApiError, storeDesktopTokens } from '../../api/http.ts';
 import { useGame } from '../../state/store.ts';
 import { Button } from '../common.tsx';
+import { UNOFFICIAL_NOTICE } from '../format.ts';
 
 export function AuthScreen() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -157,6 +158,7 @@ export function AuthScreen() {
         Study Kingdom counts the time you study; it can't verify what you learn. Be honest with yourself —
         that's where the real reward is.
       </p>
+      <p className="auth-foot muted small">{UNOFFICIAL_NOTICE}</p>
     </div>
   );
 }

@@ -79,7 +79,7 @@ export function SocialPanel() {
                 <div className="row between">
                   <strong>{f.displayName}</strong>
                   <span>
-                    HQ {f.hqLevel} · 🏆 {f.trophies}
+                    Keep {f.hqLevel} · 🏆 {f.trophies}
                   </span>
                 </div>
                 <div className="row wrap">
@@ -163,8 +163,8 @@ export function SocialPanel() {
           </ul>
           <h3>Ranked raids</h3>
           <p className="small muted">
-            Matched by HQ, army strength and trophies. Defenders keep their resources. Up to 20 raids daily;
-            only the first 3 wins earn resources.
+            Matched by Keep level, army strength and trophies. Defenders keep their resources. Up to 20 raids
+            daily; only the first 3 wins earn resources.
           </p>
           <Button busy={busy} onClick={() => void run(() => attack('ranked'))}>
             Find ranked opponent

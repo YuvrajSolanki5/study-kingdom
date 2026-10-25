@@ -35,7 +35,9 @@
     "deploy:edge": "node scripts/build-edge.mjs && supabase functions deploy verify-battle --no-verify-jwt",
     "test:edge": "vitest run --project edge",
     "balance:combat": "node --experimental-strip-types scripts/balance-combat.ts",
-    "test:backup": "node --experimental-strip-types scripts/db/test-backup.mjs"
+    "test:backup": "node --experimental-strip-types scripts/db/test-backup.mjs",
+    "assets:fetch": "python3 -I scripts/assets/fetch-fankit.py",
+    "assets:sprites": "node scripts/assets/build-sprites.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -45,6 +47,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.13.0",
     "prettier": "^3.9.10",
+    "sharp": "^0.34.5",
     "supabase": "2.122.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.0",

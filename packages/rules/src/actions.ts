@@ -81,9 +81,9 @@ export function applyAction(ctx: Ctx, input: PlayerAggregate, action: VillageAct
       if (def.category === 'wall') fail('invalid', 'Use build_walls for walls');
       const hq = hqLevel(s);
       if (countBuildings(s, action.defId) >= maxCountAt(def, hq))
-        fail('limit_reached', `No more ${def.name} allowed at this Headquarters level`);
+        fail('limit_reached', `No more ${def.name} allowed at this Keep level`);
       const lvl = def.levels[0];
-      if (!lvl || lvl.hq > hq) fail('requirement', `${def.name} unlocks at Headquarters ${lvl?.hq}`);
+      if (!lvl || lvl.hq > hq) fail('requirement', `${def.name} unlocks at Keep ${lvl?.hq}`);
       const occ = occupancy(content, s.buildings);
       if (!areaFree(content, occ, action.defId, action.x, action.y))
         fail('blocked', 'That space is not free');
@@ -111,14 +111,14 @@ export function applyAction(ctx: Ctx, input: PlayerAggregate, action: VillageAct
       const def = structureDef(content, 'wall');
       const hq = hqLevel(s);
       const lvl = def.levels[0];
-      if (!lvl || lvl.hq > hq) fail('requirement', `Walls unlock at Headquarters ${lvl?.hq}`);
+      if (!lvl || lvl.hq > hq) fail('requirement', `Ramparts unlock at Keep ${lvl?.hq}`);
       if (!action.positions.length || action.positions.length > MAX_BATCH) fail('invalid', 'Bad wall batch');
       if (countBuildings(s, 'wall') + action.positions.length > maxCountAt(def, hq))
         fail('limit_reached', 'Not enough walls available');
       const occ = occupancy(content, s.buildings);
       const total = { gold: (lvl.cost.gold ?? 0) * action.positions.length };
       for (const p of action.positions) {
-        if (!areaFree(content, occ, 'wall', p.x, p.y)) fail('blocked', `Wall at ${p.x},${p.y} is blocked`);
+        if (!areaFree(content, occ, 'wall', p.x, p.y)) fail('blocked', `Rampart at ${p.x},${p.y} is blocked`);
         markArea(content, occ, -2, 'wall', p.x, p.y);
       }
       spend(agg, total, deltas, 'build_walls');
@@ -134,7 +134,7 @@ export function applyAction(ctx: Ctx, input: PlayerAggregate, action: VillageAct
       const def = structureDef(content, b.defId);
       const next = def.levels[b.level];
       if (!next) fail('limit_reached', `${def.name} is at max level`);
-      if (next.hq > hqLevel(s)) fail('requirement', `Requires Headquarters ${next.hq}`);
+      if (next.hq > hqLevel(s)) fail('requirement', `Requires Keep ${next.hq}`);
       if (next.seconds > 0) {
         const builder = freeBuilder(s);
         if (builder < 0) fail('no_builder', 'All builders are busy');
@@ -168,7 +168,7 @@ export function applyAction(ctx: Ctx, input: PlayerAggregate, action: VillageAct
       for (const w of walls) {
         const next = def.levels[w.level];
         if (!next) fail('limit_reached', 'A wall is already at max level');
-        if (next.hq > hq) fail('requirement', `Requires Headquarters ${next.hq}`);
+        if (next.hq > hq) fail('requirement', `Requires Keep ${next.hq}`);
         gold += next.cost.gold ?? 0;
         essence += next.cost.essence ?? 0;
       }
@@ -261,11 +261,11 @@ export function applyAction(ctx: Ctx, input: PlayerAggregate, action: VillageAct
     }
     case 'research': {
       const library = buildingLevelMax(s, 'research_library');
-      if (library < 1) fail('requirement', 'Build a Research Library first');
+      if (library < 1) fail('requirement', 'Build a Lorehouse first');
       const libBusy = s.buildings.some(
         (b) => b.defId === 'research_library' && b.level >= 1 && buildingUpgrading(s, b.id),
       );
-      if (libBusy) fail('busy', 'The Research Library is being upgraded');
+      if (libBusy) fail('busy', 'The Lorehouse is being upgraded');
       if (s.research) fail('busy', 'Research already in progress');
       const { levels, unlocked, table } = researchTarget(ctx, s, action.kind, action.id);
       if (!unlocked) fail('requirement', 'Unlock it first');
@@ -274,9 +274,9 @@ export function applyAction(ctx: Ctx, input: PlayerAggregate, action: VillageAct
       if (!next) fail('limit_reached', 'Already at max level');
       const needLibrary = 'libraryLevel' in next ? next.libraryLevel : 0;
       const needWorkshop = 'workshopLevel' in next ? next.workshopLevel : 0;
-      if (needLibrary > library) fail('requirement', `Requires Research Library ${needLibrary}`);
+      if (needLibrary > library) fail('requirement', `Requires Lorehouse ${needLibrary}`);
       if (needWorkshop > buildingLevelMax(s, 'workshop'))
-        fail('requirement', `Requires Workshop ${needWorkshop}`);
+        fail('requirement', `Requires Tinker Forge ${needWorkshop}`);
       const paid = spend(
         agg,
         next.researchCost,
@@ -335,7 +335,7 @@ export function applyAction(ctx: Ctx, input: PlayerAggregate, action: VillageAct
           fail('requirement', 'Siege not unlocked');
         const def = content.siege[action.id]!;
         const used = sumCounts(s.army.siege) + queue.length;
-        if (used + action.count > siegeCapacity(content, s)) fail('capacity', 'Workshop capacity full');
+        if (used + action.count > siegeCapacity(content, s)) fail('capacity', 'Tinker Forge capacity full');
         seconds = def.buildSeconds;
       }
       let t = queue.length ? (queue[queue.length - 1] as QueueItem).endsAt : ctx.now;
@@ -371,7 +371,7 @@ export function applyAction(ctx: Ctx, input: PlayerAggregate, action: VillageAct
       const current = s.heroes[action.heroId]?.level ?? 0;
       const next = def.levels[current];
       if (!next) fail('limit_reached', `${def.name} is at max level`);
-      if (next.hq > hqLevel(s)) fail('requirement', `Requires Headquarters ${next.hq}`);
+      if (next.hq > hqLevel(s)) fail('requirement', `Requires Keep ${next.hq}`);
       const builder = freeBuilder(s);
       if (builder < 0) fail('no_builder', 'All builders are busy');
       const paid = spend(agg, next.cost, deltas, 'hero_upgrade', `hero:${action.heroId}:${next.level}`);

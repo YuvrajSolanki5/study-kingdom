@@ -14,6 +14,14 @@ test('new player: register → study → upgrade → train → win a battle', as
     () => (window as unknown as { __sk?: { scene: string } }).__sk?.scene === 'village',
   );
   expect(await hudGold(page)).toBe(750);
+  // Regression: the starter village draws its buildings on first load, not just the ground.
+  const drawn = await page.evaluate(
+    () =>
+      (
+        window as unknown as { __sk: { owner: { children: { list: { type: string }[] } } } }
+      ).__sk.owner.children.list.filter((o) => o.type === 'Image').length,
+  );
+  expect(drawn).toBeGreaterThan(5);
 
   // Study: a short paper session finished early still earns proportional credit.
   await page.getByRole('button', { name: /Study/ }).first().click();
@@ -34,7 +42,7 @@ test('new player: register → study → upgrade → train → win a battle', as
   // Upgrade the treasury (tile 25,20, size 3): select it, then upgrade.
   const t = await tileToPage(page, 26.5, 21.5);
   await page.mouse.click(t.x, t.y);
-  await expect(page.getByRole('dialog', { name: /Treasury/ })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: /Gilded Vault/ })).toBeVisible();
   await page.getByRole('button', { name: 'Upgrade', exact: true }).click();
   await expect(page.getByText(/Upgrading to level 2/)).toBeVisible();
   expect(await hudGold(page)).toBe(afterStudy - 750);

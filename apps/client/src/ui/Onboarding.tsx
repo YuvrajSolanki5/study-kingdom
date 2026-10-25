@@ -1,5 +1,5 @@
 import { useGame } from '../state/store.ts';
-import { Button } from './common.tsx';
+import { Button, Icon } from './common.tsx';
 /** A dismissible guide that leaves every game control accessible. */
 export function Onboarding() {
   const view = useGame((s) => s.view),
@@ -18,6 +18,7 @@ export function Onboarding() {
   const upgraded = view.state.buildings.some((b) => b.level > 1) || view.state.builders.some(Boolean);
   return (
     <aside className="onboarding" aria-label="Getting started">
+      <Icon name="builder" size={64} className="guide-art" />
       <strong>Welcome to your kingdom</strong>
       <p>Study earns Gold and Essence. Upgrade your village, train an army, then take on Bandit Camp.</p>
       <p className="small muted">

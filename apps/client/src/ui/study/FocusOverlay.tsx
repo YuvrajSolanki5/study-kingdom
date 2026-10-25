@@ -296,7 +296,7 @@ function ResultModal({ session, onClose }: { session: SessionView; onClose(): vo
       {r && (r.overflowGold > 0 || r.overflowEssence > 0) ? (
         <p className="warn small">
           Storage was full: {r.overflowGold} Gold and {r.overflowEssence} Essence did not fit. Upgrade your
-          Treasury to keep more.
+          Gilded Vault to keep more.
         </p>
       ) : null}
       {session.distractedSeconds > 0 ? (

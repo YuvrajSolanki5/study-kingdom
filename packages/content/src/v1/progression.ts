@@ -1,22 +1,38 @@
 import type { EconomyConfig, HqTierInfo } from '../types.ts';
 
 export const hqTiers: HqTierInfo[] = [
-  tier(1, 0, 0, 40, ['Swordsmen and Archers', 'Bolt Throwers and a Watchtower', 'Two builders']),
-  tier(2, 1, 0, 55, ['Walls: break through or go around?', 'Bulwark tanks', 'Research Library and Thunder']),
-  tier(3, 1, 0, 75, ['Catapult splash vs swarms', 'Sappers to breach walls', 'Blast Mines', 'Clan Hall']),
-  tier(4, 2, 0, 100, ['First flyers: Wyverns vs the new Skyspear', 'Looters', 'Spring Snares', 'Mending']),
-  tier(5, 2, 0, 130, ['Arcane Spire', 'Mages', 'Fury spell', 'Sky Mines', 'Hero: the Warlord']),
-  tier(6, 3, 0, 170, ['Skyships bomb defences', 'Frost spell', 'Second Skyspear']),
-  tier(7, 3, 1, 220, [
-    'Hidden Storm Totems',
-    'Vaulters jump walls',
-    'Leap spell',
-    'Workshop: Battering Ram',
-    'Hero: the Sage',
+  tier(1, 0, 0, 40, ['Squires and Fletchers', 'Boltcasters and a Hawk Roost', 'Two builders']),
+  tier(2, 1, 0, 55, ['Walls: break through or go around?', 'Ironhide tanks', 'Lorehouse and Thunderclap']),
+  tier(3, 1, 0, 75, [
+    'Boulder Lobber splash vs swarms',
+    'Powder Sappers to breach walls',
+    'Boom Barrels',
+    'Banner Hall',
   ]),
-  tier(8, 4, 1, 280, ['Repeaters', 'Drakes', 'Aegis spell', 'Seeker Mines']),
-  tier(9, 5, 1, 350, ['Ember Towers melt tanks', 'Menders heal ground armies']),
-  tier(10, 6, 1, 430, ['Necromancers raise skeletons', 'Max levels for heroes and defences']),
+  tier(4, 2, 0, 100, [
+    'First flyers: Glidewings vs the new Sky Harpoon',
+    'Pilferers',
+    'Bounce Plates',
+    'Mending Mist',
+  ]),
+  tier(5, 2, 0, 130, [
+    'Runeglass Spire',
+    'Spellslingers',
+    'War Cry spell',
+    'Puff Mines',
+    'Hero: Warlord Brannoc',
+  ]),
+  tier(6, 3, 0, 170, ['Skybarges bomb defences', 'Frostbind spell', 'Second Sky Harpoon']),
+  tier(7, 3, 1, 220, [
+    'Hidden Stormcaller Totems',
+    'Wallhoppers jump walls',
+    'Skystep spell',
+    'Tinker Forge: Gatebreaker',
+    'Hero: Sage Elowen',
+  ]),
+  tier(8, 4, 1, 280, ['Rattle Arbalests', 'Elder Drakes', 'Aegis Ward spell', 'Homing Thorns']),
+  tier(9, 5, 1, 350, ['Cinder Pyres melt tanks', 'Lightwings heal ground armies']),
+  tier(10, 6, 1, 430, ['Bonecallers raise Rattlebones', 'Max levels for heroes and defences']),
 ];
 
 function tier(level: number, spells: number, siege: number, gold: number, highlights: string[]): HqTierInfo {

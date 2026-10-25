@@ -5,7 +5,7 @@ import { ApiError, isNetworkError } from '../../api/http.ts';
 import { battleBridge, useBattleHud, type Selection } from '../../state/battleHud.ts';
 import { contentOf, useGame } from '../../state/store.ts';
 import { friendly } from '../auth/AuthScreen.tsx';
-import { Button, CostView, Modal, Stars } from '../common.tsx';
+import { Button, CostView, Icon, Modal, Stars } from '../common.tsx';
 import { fmtClock } from '../format.ts';
 
 export function BattleHud() {
@@ -60,6 +60,7 @@ export function BattleHud() {
                 disabled={left <= 0}
                 onClick={() => choose({ k: 'troop', id: t.id })}
               >
+                <Icon name={t.id} size={52} className="tray-art" />
                 <span className="tray-name">{content.troops[t.id]?.name ?? t.id}</span>
                 <span className="tray-count">×{left}</span>
                 <span className="tag">Lv {t.level}</span>
@@ -75,6 +76,7 @@ export function BattleHud() {
                 className={`tray-card hero ${isSel('hero', h.id) ? 'on' : ''}`}
                 onClick={() => choose({ k: 'hero', id: h.id })}
               >
+                <Icon name={h.id} size={52} className="tray-art" />
                 <span className="tray-name">{content.heroes[h.id]?.name ?? h.id}</span>
                 <span className="tag">{h.hpPercent}% ❤</span>
               </button>
@@ -84,6 +86,7 @@ export function BattleHud() {
                 className="tray-card ability"
                 onClick={() => battleBridge.activateAbility?.(h.id)}
               >
+                <Icon name={h.id} size={52} className="tray-art" />
                 <span className="tray-name">{content.heroes[h.id]?.abilityName ?? 'Ability'}</span>
                 <span className="tag">Activate</span>
               </button>
@@ -98,6 +101,7 @@ export function BattleHud() {
                 disabled={left <= 0}
                 onClick={() => choose({ k: 'siege', id: s.id })}
               >
+                <Icon name={s.id} size={52} className="tray-art" />
                 <span className="tray-name">{content.siege[s.id]?.name ?? s.id}</span>
                 <span className="tray-count">×{left}</span>
               </button>
@@ -109,6 +113,7 @@ export function BattleHud() {
               disabled={hud.started && !hud.remaining.reinforcements}
               onClick={() => choose({ k: 'reinforce' })}
             >
+              <Icon name="clan" size={52} className="tray-art" />
               <span className="tray-name">Clan troops</span>
             </button>
           ) : null}
@@ -121,6 +126,7 @@ export function BattleHud() {
                 disabled={left <= 0}
                 onClick={() => choose({ k: 'spell', id: s.id })}
               >
+                <Icon name={s.id} size={52} className="tray-art" />
                 <span className="tray-name">{content.spells[s.id]?.name ?? s.id}</span>
                 <span className="tray-count">×{left}</span>
               </button>

@@ -7,6 +7,7 @@ import { useGame } from '../../state/store.ts';
 import { friendly } from '../auth/AuthScreen.tsx';
 import { Button, Panel } from '../common.tsx';
 import { checkForUpdates } from '../desktop/UpdatePrompt.tsx';
+import { UNOFFICIAL_NOTICE } from '../format.ts';
 
 export function SettingsPanel() {
   const view = useGame((s) => s.view)!;
@@ -109,6 +110,7 @@ export function SettingsPanel() {
         <p className="muted small">
           Version {APP_VERSION} · {IS_DESKTOP ? 'Mac app' : 'Web'}
         </p>
+        <p className="muted small">{UNOFFICIAL_NOTICE}</p>
         {IS_DESKTOP ? <Button onClick={() => void checkForUpdates(true)}>Check for updates</Button> : null}
         <div className="row">
           <Button onClick={() => void signOut(false)}>Sign out</Button>

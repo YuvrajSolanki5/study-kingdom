@@ -1,459 +1,314 @@
 import type { GameContent } from '@sk/content';
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
+import { drawBuilding, drawUnder, FALLBACK, SPECS } from './art/buildings.ts';
+import { css, type Ctx, INK, Iso, makeTexture, rng, softShadow, tone } from './art/canvas.ts';
+import { drawUnitShadow, FALLBACK_UNIT, UNITS } from './art/units.ts';
 import { TH, TW } from './iso.ts';
+import sprites from './sprite-index.json';
 
-// All art is procedural and original: each texture is drawn once with vector
-// primitives and cached by key.
+// Buildings use sprites derived from the Supercell fan kit when available
+// (scripts/assets/build-sprites.mjs, docs/licensing.md); everything else is
+// procedural Canvas 2D art drawn once and cached by key. Procedural building
+// textures are `size*TW + 8` wide with the ground diamond's bottom corner 2px
+// above the bottom edge. Always place sprites with fitSprite().
 
-type G = Phaser.GameObjects.Graphics;
-type Pt = { x: number; y: number };
-
-export function shade(color: number, f: number): number {
-  const r = Math.min(255, Math.round(((color >> 16) & 0xff) * f));
-  const g = Math.min(255, Math.round(((color >> 8) & 0xff) * f));
-  const b = Math.min(255, Math.round((color & 0xff) * f));
-  return (r << 16) | (g << 8) | b;
+interface SpriteEntry {
+  file: string;
+  w: number;
+  h: number;
+  dy: number;
 }
-
-const OUTLINE = 0x2b2118;
-
-/** Visual palette for the three upgrade stages of every building family. */
-const STAGES = [
-  { wall: 0xa0703c, trim: 0x6b4423, roof: 0xb5482f, metal: 0x6f6f6f },
-  { wall: 0x9aa3ad, trim: 0x5f6b78, roof: 0x3d6fb6, metal: 0x8a8f96 },
-  { wall: 0xe9e2cf, trim: 0xe0b23c, roof: 0x6c3fb0, metal: 0xe0b23c },
-] as const;
-
-class Painter {
-  readonly g: G;
-  readonly s: number;
-  readonly cx: number;
-  readonly cy: number;
-  constructor(g: G, s: number, w: number, h: number) {
-    this.g = g;
-    this.s = s;
-    this.cx = w / 2;
-    this.cy = h - 2 - (s * TH) / 2;
-  }
-
-  diamond(k: number, elev: number, dx = 0, dy = 0): { T: Pt; R: Pt; B: Pt; L: Pt } {
-    const hw = (k * this.s * TW) / 2;
-    const hh = (k * this.s * TH) / 2;
-    const x = this.cx + dx;
-    const y = this.cy + dy - elev;
-    return { T: { x, y: y - hh }, R: { x: x + hw, y }, B: { x, y: y + hh }, L: { x: x - hw, y } };
-  }
-
-  poly(points: Pt[], color: number, alpha = 1, outline = true) {
-    const g = this.g;
-    g.fillStyle(color, alpha);
-    g.beginPath();
-    g.moveTo(points[0]!.x, points[0]!.y);
-    for (let i = 1; i < points.length; i++) g.lineTo(points[i]!.x, points[i]!.y);
-    g.closePath();
-    g.fillPath();
-    if (outline) {
-      g.lineStyle(1, OUTLINE, 0.55);
-      g.strokePath();
-    }
-  }
-
-  ground(color: number, k = 1) {
-    const d = this.diamond(k, 0);
-    this.poly([d.T, d.R, d.B, d.L], color, 1, false);
-  }
-
-  prism(k: number, z: number, height: number, color: number, dx = 0, dy = 0) {
-    const a = this.diamond(k, z, dx, dy);
-    const b = this.diamond(k, z + height, dx, dy);
-    this.poly([a.L, a.B, b.B, b.L], shade(color, 0.82));
-    this.poly([a.B, a.R, b.R, b.B], shade(color, 0.64));
-    this.poly([b.T, b.R, b.B, b.L], shade(color, 1.08));
-  }
-
-  pyramid(k: number, z: number, height: number, color: number, dx = 0, dy = 0) {
-    const a = this.diamond(k, z, dx, dy);
-    const apex = { x: this.cx + dx, y: this.cy + dy - z - height };
-    this.poly([a.L, a.B, apex], shade(color, 0.92));
-    this.poly([a.B, a.R, apex], shade(color, 0.7));
-  }
-
-  cylinder(r: number, z: number, height: number, color: number, dx = 0, dy = 0) {
-    const g = this.g;
-    const x = this.cx + dx;
-    const y = this.cy + dy - z;
-    g.fillStyle(shade(color, 0.8), 1);
-    g.fillEllipse(x, y, r * 2, r);
-    g.fillRect(x - r, y - height, r * 2, height);
-    g.fillStyle(shade(color, 0.64), 1);
-    g.fillRect(x, y - height, r, height);
-    g.fillStyle(shade(color, 1.08), 1);
-    g.fillEllipse(x, y - height, r * 2, r);
-    g.lineStyle(1, OUTLINE, 0.5);
-    g.strokeEllipse(x, y - height, r * 2, r);
-    g.lineBetween(x - r, y - height, x - r, y);
-    g.lineBetween(x + r, y - height, x + r, y);
-  }
-
-  cone(r: number, z: number, height: number, color: number, dx = 0, dy = 0) {
-    const x = this.cx + dx;
-    const y = this.cy + dy - z;
-    this.poly(
-      [
-        { x: x - r, y },
-        { x, y: y + r / 2 },
-        { x, y: y - height },
-      ],
-      shade(color, 0.92),
-    );
-    this.poly(
-      [
-        { x, y: y + r / 2 },
-        { x: x + r, y },
-        { x, y: y - height },
-      ],
-      shade(color, 0.7),
-    );
-  }
-
-  disc(rx: number, z: number, color: number, dx = 0, dy = 0, alpha = 1) {
-    this.g.fillStyle(color, alpha);
-    this.g.fillEllipse(this.cx + dx, this.cy + dy - z, rx * 2, rx);
-  }
-
-  flag(z: number, color: number, dx = 0) {
-    const g = this.g;
-    const x = this.cx + dx;
-    const y = this.cy - z;
-    g.lineStyle(2, 0x3b2a1a, 1);
-    g.lineBetween(x, y, x, y - 26);
-    this.poly(
-      [
-        { x, y: y - 26 },
-        { x: x + 16, y: y - 21 },
-        { x, y: y - 16 },
-      ],
-      color,
-    );
-  }
-
-  window(dx: number, z: number, w = 5, h = 7, color = 0x2a1d12) {
-    this.g.fillStyle(color, 1);
-    this.g.fillRect(this.cx + dx - w / 2, this.cy - z - h, w, h);
-  }
+interface UnitEntry {
+  file: string;
+  left: boolean;
+  flying: boolean;
 }
-
-interface Spec {
-  head: number;
-  draw(p: Painter, stage: (typeof STAGES)[number], stageIndex: number): void;
+interface SpriteMeta {
+  scale: number;
+  originY: number;
+  /** Unit art drawn facing left; the battle scene flips sprites to match movement. */
+  faceLeft?: boolean;
 }
-
-const SPECS: Record<string, Spec> = {
-  headquarters: {
-    head: 150,
-    draw(p, c, i) {
-      p.ground(0x6e5b43, 0.95);
-      p.prism(0.86, 0, 34, c.wall);
-      p.prism(0.6, 34, 30 + i * 6, shade(c.wall, 1.05));
-      p.pyramid(0.66, 64 + i * 6, 34, c.roof);
-      for (const dx of [-30, -12, 12, 30]) p.window(dx, 14);
-      p.window(0, 46 + i * 3, 6, 9);
-      p.g.fillStyle(c.trim, 1);
-      p.g.fillRect(p.cx - 9, p.cy - 2 - 18, 18, 18);
-      p.flag(98 + i * 6, i === 2 ? 0xe0b23c : 0xc0392b);
-      if (i >= 1) for (const dx of [-44, 44]) p.cylinder(7, 0, 44, c.wall, dx, -2);
-      if (i >= 2) for (const dx of [-44, 44]) p.cone(9, 44, 18, c.roof, dx, -2);
-    },
-  },
-  treasury: {
-    head: 90,
-    draw(p, c, i) {
-      p.ground(0x6e5b43, 0.9);
-      p.prism(0.78, 0, 22, c.wall);
-      p.disc(26, 22, 0xe0b23c);
-      p.disc(18 + i * 3, 30, shade(0xe0b23c, 1.15));
-      p.g.fillStyle(0x7d4fd1, 1);
-      p.g.fillCircle(p.cx + 16, p.cy - 30, 5 + i);
-      p.g.fillStyle(0xfff3b0, 1);
-      p.g.fillCircle(p.cx - 10, p.cy - 36, 4);
-      p.window(0, 4, 10, 12, c.trim);
-    },
-  },
-  barracks: {
-    head: 90,
-    draw(p, c, i) {
-      p.ground(0x6e5b43, 0.9);
-      p.prism(0.78, 0, 26, c.wall);
-      p.pyramid(0.84, 26, 22 + i * 3, c.roof);
-      p.window(0, 3, 10, 14, c.trim);
-      const g = p.g;
-      g.lineStyle(3, 0xd9d9d9, 1);
-      g.lineBetween(p.cx - 12, p.cy - 62, p.cx + 12, p.cy - 40);
-      g.lineBetween(p.cx + 12, p.cy - 62, p.cx - 12, p.cy - 40);
-    },
-  },
-  army_camp: {
-    head: 60,
-    draw(p, c, i) {
-      p.ground(0x8a7353, 0.92);
-      p.ground(0x9c855f, 0.7);
-      const tents: [number, number][] = [
-        [-34, -6],
-        [30, -8],
-        [0, 14],
-        ...(i >= 1 ? ([[0, -26]] as [number, number][]) : []),
-      ];
-      for (const [dx, dy] of tents) {
-        p.cone(14, 0, 22, i === 2 ? 0xe9e2cf : 0xc9b48a, dx, dy);
-      }
-      p.disc(8, 1, 0x5a3b1e);
-      p.g.fillStyle(0xff8c1a, 1);
-      p.g.fillTriangle(p.cx - 5, p.cy - 2, p.cx + 5, p.cy - 2, p.cx, p.cy - 16);
-      p.g.fillStyle(0xffd34d, 1);
-      p.g.fillTriangle(p.cx - 2, p.cy - 2, p.cx + 2, p.cy - 2, p.cx, p.cy - 10);
-      if (c) p.flag(4, 0x3b82f6, 44);
-    },
-  },
-  research_library: {
-    head: 120,
-    draw(p, c, i) {
-      p.ground(0x6e5b43, 0.9);
-      p.prism(0.72, 0, 26, c.wall);
-      p.cylinder(16, 26, 26 + i * 6, shade(c.wall, 1.05));
-      p.cone(20, 52 + i * 6, 30, 0x2f5fa8);
-      p.window(-14, 8);
-      p.window(14, 8);
-      p.g.fillStyle(0x9fd3ff, 1);
-      p.g.fillCircle(p.cx, p.cy - 40 - i * 3, 4);
-    },
-  },
-  builder_lodge: {
-    head: 60,
-    draw(p, c) {
-      p.ground(0x6e5b43, 0.9);
-      p.prism(0.7, 0, 18, c.wall);
-      p.pyramid(0.8, 18, 16, 0xd9822b);
-      p.window(0, 2, 6, 9, c.trim);
-      const g = p.g;
-      g.lineStyle(3, 0x5a3b1e, 1);
-      g.lineBetween(p.cx + 18, p.cy - 8, p.cx + 26, p.cy - 22);
-      g.fillStyle(0x777777, 1);
-      g.fillRect(p.cx + 22, p.cy - 26, 9, 5);
-    },
-  },
-  clan_hall: {
-    head: 110,
-    draw(p, c, i) {
-      p.ground(0x6e5b43, 0.9);
-      p.prism(0.8, 0, 28, c.wall);
-      p.prism(0.5, 28, 14, shade(c.wall, 1.05));
-      p.pyramid(0.56, 42, 22, c.roof);
-      p.flag(64, 0x16a34a, -6);
-      p.flag(64, 0xe0b23c, 8);
-      p.window(0, 3, 10, 14, c.trim);
-      if (i >= 2) p.disc(6, 70, 0xe0b23c);
-    },
-  },
-  workshop: {
-    head: 90,
-    draw(p, c, i) {
-      p.ground(0x6e5b43, 0.9);
-      p.prism(0.8, 0, 24, c.wall);
-      p.pyramid(0.86, 24, 14, c.roof);
-      const g = p.g;
-      g.lineStyle(4, c.metal, 1);
-      g.strokeCircle(p.cx + 4, p.cy - 50, 9 + i);
-      g.fillStyle(c.metal, 1);
-      g.fillCircle(p.cx + 4, p.cy - 50, 3);
-    },
-  },
-  bolt_thrower: {
-    head: 70,
-    draw(p, c, i) {
-      p.ground(0x6e5b43, 0.9);
-      p.prism(0.74, 0, 14, c.wall);
-      p.disc(18, 14, shade(c.trim, 1.1));
-      const g = p.g;
-      g.fillStyle(i === 2 ? 0x8f6a12 : 0x3a3a3a, 1);
-      g.fillRoundedRect(p.cx - 4, p.cy - 34, 30, 10, 4);
-      g.fillStyle(0x222222, 1);
-      g.fillCircle(p.cx + 26, p.cy - 29, 4);
-      g.fillStyle(0x5a3b1e, 1);
-      g.fillRect(p.cx - 10, p.cy - 28, 10, 10);
-    },
-  },
-  watchtower: {
-    head: 140,
-    draw(p, c, i) {
-      p.ground(0x6e5b43, 0.9);
-      const g = p.g;
-      g.lineStyle(4, shade(c.trim, 0.9), 1);
-      for (const [dx, dy] of [
-        [-22, 0],
-        [22, 0],
-        [0, 12],
-        [0, -12],
-      ] as [number, number][])
-        g.lineBetween(p.cx + dx, p.cy + dy, p.cx + dx * 0.5, p.cy + dy * 0.5 - 70);
-      p.prism(0.5, 70, 14 + i * 2, c.wall);
-      p.pyramid(0.58, 84 + i * 2, 24, c.roof);
-      g.fillStyle(0x16a34a, 1);
-      g.fillCircle(p.cx - 6, p.cy - 90, 4);
-      g.fillCircle(p.cx + 8, p.cy - 88, 4);
-    },
-  },
-  wall: {
-    head: 40,
-    draw(p, c, i) {
-      p.prism(0.82, 0, 16 + i * 2, i === 0 ? 0x8c6239 : c.wall);
-      if (i === 2) p.prism(0.3, 18 + i * 2, 4, 0xe0b23c);
-    },
-  },
+const SPRITES = sprites as {
+  res: number;
+  buildings: Record<string, (SpriteEntry | null)[]>;
+  units: Record<string, UnitEntry>;
+  scenery: Record<string, { file: string; w: number; h: number }>;
 };
+const SPRITE_URL = `${import.meta.env.BASE_URL}sprites/`;
+/** Emitted on a scene when on-demand sprites finish loading, so it can redraw. */
+export const SPRITES_READY = 'sk-sprites-ready';
 
-const FALLBACK: Spec = {
-  head: 100,
-  draw(p, c) {
-    p.ground(0x6e5b43, 0.9);
-    p.prism(0.75, 0, 30, c.wall);
-    p.pyramid(0.8, 30, 20, c.roof);
-  },
-};
+function spriteOf(defId: string, level: number) {
+  const e = SPRITES.buildings[defId]?.[level - 1];
+  if (!e) return null;
+  return {
+    key: `sc:b:${defId}:${level}`,
+    url: SPRITE_URL + e.file,
+    meta: { scale: 1 / SPRITES.res, originY: 1 - e.dy },
+  };
+}
+
+function unitSpriteOf(defId: string) {
+  const e = SPRITES.units[defId];
+  if (!e) return null;
+  // Feet sit at the bottom of the art; flyers hover a little above their anchor.
+  const meta = { scale: 1 / SPRITES.res, originY: e.flying ? 0.9 : 0.97, faceLeft: e.left };
+  return { key: `sc:u:${defId}`, url: SPRITE_URL + e.file, meta };
+}
+
+const pending = new WeakMap<Phaser.Scene, Set<string>>();
+const metaOf = new Map<string, SpriteMeta>();
+
+function queueSprite(
+  scene: Phaser.Scene,
+  { key, url, meta }: { key: string; url: string; meta: SpriteMeta },
+) {
+  let set = pending.get(scene);
+  if (!set) {
+    set = new Set();
+    pending.set(scene, set);
+    // The loader drops its listeners when the scene shuts down.
+    scene.events.once('shutdown', () => pending.delete(scene));
+    scene.load.on('filecomplete', (k: string) => {
+      const meta = metaOf.get(k);
+      if (meta) scene.textures.get(k).customData = meta;
+    });
+    scene.load.on('complete', () => {
+      set!.clear();
+      scene.events.emit(SPRITES_READY);
+    });
+  }
+  if (set.has(key)) return;
+  set.add(key);
+  metaOf.set(key, meta);
+  scene.load.image(key, url);
+  // During preload() Phaser starts the loader itself and waits for it before
+  // create(); starting it early would make the scene skip that wait.
+  if (!scene.load.isLoading() && scene.sys.settings.status !== Phaser.Scenes.LOADING) scene.load.start();
+}
+
+/** Queues sprites for these buildings; call from preload() so create() has them. */
+export function preloadBuildings(scene: Phaser.Scene, list: { defId: string; level: number }[]) {
+  for (const b of list) {
+    const s = b.level > 0 ? spriteOf(b.defId, b.level) : null;
+    if (s && !scene.textures.exists(s.key)) queueSprite(scene, s);
+  }
+}
+
+/** Queues every unit sprite; they are small and any unit can appear in a battle. */
+export function preloadUnits(scene: Phaser.Scene) {
+  for (const id of Object.keys(SPRITES.units)) {
+    const s = unitSpriteOf(id)!;
+    if (!scene.textures.exists(s.key)) queueSprite(scene, s);
+  }
+}
+
+/** Queues the trees, bushes and rocks drawn into the ground texture. */
+export function preloadScenery(scene: Phaser.Scene) {
+  for (const [id, e] of Object.entries(SPRITES.scenery)) {
+    const key = `sc:s:${id}`;
+    if (!scene.textures.exists(key))
+      queueSprite(scene, { key, url: SPRITE_URL + e.file, meta: { scale: 1, originY: 1 } });
+  }
+}
+
+/** True when the image shows fan kit art (not procedural art). */
+export function isFanArt(img: Phaser.GameObjects.Image) {
+  return img.texture.key.startsWith('sc:');
+}
+
+export function facesLeft(img: Phaser.GameObjects.Image) {
+  return !!(img.texture.customData as SpriteMeta).faceLeft;
+}
+
+/**
+ * Scales and anchors any building or unit image by its texture's metadata.
+ * Procedural textures fall back to `originY` (default: the building anchor).
+ */
+export function fitSprite(img: Phaser.GameObjects.Image, scale = 1, originY?: number) {
+  const meta = img.texture.customData as Partial<SpriteMeta>;
+  img.setScale((meta.scale ?? 1) * scale);
+  img.setOrigin(0.5, meta.originY ?? originY ?? (img.height - 2) / img.height);
+  return img;
+}
 
 export function stageOf(content: GameContent, defId: string, level: number): number {
   const stages = content.structures[defId]?.visualStages ?? [1, 2, 3];
   return level >= stages[2] ? 2 : level >= stages[1] ? 1 : 0;
 }
 
-/** Ensures the texture for a building at a level exists and returns its key and anchor info. */
+/**
+ * Ensures the texture for a building at a level exists and returns its key.
+ * `variant` is a wall's connection mask: bit 1 joins toward +x, bit 2 toward +y.
+ */
 export function buildingTexture(
   scene: Phaser.Scene,
   content: GameContent,
   defId: string,
   level: number,
+  variant = 0,
 ): string {
   const size = content.structures[defId]?.size ?? 2;
   if (level <= 0) return constructionTexture(scene, size);
+  // Fan kit art when its sprite is loaded; otherwise load it and draw procedural
+  // art until SPRITES_READY.
+  const sprite = spriteOf(defId, level);
+  if (sprite) {
+    if (scene.textures.exists(sprite.key)) return sprite.key;
+    queueSprite(scene, sprite);
+  }
   const stage = stageOf(content, defId, level);
-  const key = `b:${defId}:${stage}`;
+  const key = `b:${defId}:${stage}${variant ? `:${variant}` : ''}`;
   if (scene.textures.exists(key)) return key;
   const spec = SPECS[defId] ?? FALLBACK;
-  const w = size * TW + 8;
-  const h = size * TH + spec.head;
-  const g = scene.make.graphics({}, false);
-  spec.draw(new Painter(g, size, w, h), STAGES[stage]!, stage);
-  g.generateTexture(key, w, h);
-  g.destroy();
-  return key;
+  const w = size * TW + 8,
+    h = size * TH + spec.head;
+  return makeTexture(
+    scene,
+    key,
+    w,
+    h,
+    (ctx) => drawBuilding(ctx, spec, size, w, h, stage, variant),
+    (ctx) => drawUnder(ctx, spec, size, w, h),
+    defId === 'wall' ? 1.1 : 1.6,
+  );
 }
 
 export function constructionTexture(scene: Phaser.Scene, size: number): string {
   const key = `b:construction:${size}`;
   if (scene.textures.exists(key)) return key;
-  const w = size * TW + 8;
-  const h = size * TH + 60;
-  const g = scene.make.graphics({}, false);
-  const p = new Painter(g, size, w, h);
-  p.ground(0x8a7353, 0.9);
-  p.prism(0.6, 0, 10, 0xc9b48a);
-  g.lineStyle(2, 0x8b5a2b, 1);
-  for (const dx of [-0.3, 0.3]) {
-    const x = p.cx + dx * size * TW * 0.5;
-    g.lineBetween(x, p.cy, x, p.cy - 40);
-  }
-  g.lineBetween(p.cx - size * 9, p.cy - 30, p.cx + size * 9, p.cy - 38);
-  g.fillStyle(0xf2c94c, 1);
-  g.fillRect(p.cx - 12, p.cy - 22, 24, 6);
-  g.generateTexture(key, w, h);
-  g.destroy();
-  return key;
+  const w = size * TW + 8,
+    h = size * TH + 64;
+  return makeTexture(
+    scene,
+    key,
+    w,
+    h,
+    (ctx) => {
+      const iso = new Iso(ctx, w / 2, h - 2 - (size * TH) / 2);
+      const H = size / 2;
+      // Fresh foundation slab, scaffold poles, a plank walkway and supplies.
+      iso.box(0, 0, 0.72 * H, 0.72 * H, 0, 6, 0xb9a77f);
+      const poles: [number, number][] = [
+        [-0.6, -0.6],
+        [0.6, -0.6],
+        [-0.6, 0.6],
+        [0.6, 0.6],
+      ];
+      for (const [u, v] of poles) pole(ctx, iso.p(u * H, v * H, 6), 34 + size * 4);
+      for (const z of [22, 36 + size * 2]) {
+        iso.box(0, 0.6 * H, 0.66 * H, 0.08, z, 3, 0xc08a50);
+        iso.box(0.6 * H, 0, 0.08, 0.66 * H, z, 3, 0xc08a50);
+      }
+      const b = iso.p(-0.25 * H, 0.15 * H, 6);
+      for (let i = 0; i < 3; i++)
+        for (let j = 0; j < 3 - i; j++) {
+          ctx.fillStyle = css(tone(0xb8573a, 0.9 + ((i + j) % 2) * 0.15));
+          ctx.fillRect(b.x - 10 + j * 7 + i * 3.5, b.y - 4 - i * 4, 6.5, 4);
+          ctx.strokeStyle = INK;
+          ctx.lineWidth = 0.8;
+          ctx.strokeRect(b.x - 10 + j * 7 + i * 3.5, b.y - 4 - i * 4, 6.5, 4);
+        }
+      // Striped warning plank.
+      const s = iso.p(0.2 * H, 0.75 * H, 10);
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(-0.46);
+      ctx.fillStyle = '#f2c94c';
+      ctx.fillRect(-14, -3, 28, 6);
+      ctx.fillStyle = '#2a1a0e';
+      for (let x = -12; x < 14; x += 7) ctx.fillRect(x, -3, 3, 6);
+      ctx.strokeRect(-14, -3, 28, 6);
+      ctx.restore();
+    },
+    (ctx) => {
+      const c = { x: w / 2, y: h - 2 - (size * TH) / 2 };
+      softShadow(ctx, c.x + 4, c.y + 2, size * TW * 0.38, size * TH * 0.45, 0.28);
+    },
+  );
+}
+
+function pole(ctx: Ctx, b: { x: number; y: number }, h: number) {
+  ctx.fillStyle = '#9a6a3c';
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 1;
+  ctx.fillRect(b.x - 1.6, b.y - h, 3.2, h);
+  ctx.strokeRect(b.x - 1.6, b.y - h, 3.2, h);
 }
 
 export function rubbleTexture(scene: Phaser.Scene, size: number): string {
   const key = `b:rubble:${size}`;
   if (scene.textures.exists(key)) return key;
-  const w = size * TW + 8;
-  const h = size * TH + 20;
-  const g = scene.make.graphics({}, false);
-  const p = new Painter(g, size, w, h);
-  p.ground(0x5b4a3a, 0.85);
-  const rocks = size * 4;
-  for (let i = 0; i < rocks; i++) {
-    const a = (i * 2.399) % (Math.PI * 2);
-    const r = ((i * 37) % 100) / 100;
-    const x = p.cx + Math.cos(a) * r * size * TW * 0.3;
-    const y = p.cy + Math.sin(a) * r * size * TH * 0.3;
-    g.fillStyle(i % 2 ? 0x7a6a5a : 0x948372, 1);
-    g.fillEllipse(x, y - 3, 10, 6);
-  }
-  g.generateTexture(key, w, h);
-  g.destroy();
-  return key;
+  const w = size * TW + 8,
+    h = size * TH + 24;
+  return makeTexture(
+    scene,
+    key,
+    w,
+    h,
+    (ctx) => {
+      const iso = new Iso(ctx, w / 2, h - 2 - (size * TH) / 2);
+      const r = rng(size * 31 + 5);
+      // Scorched ground first (no outline effect: it is flat), then debris.
+      for (let i = 0; i < size * 7; i++) {
+        const a = r() * Math.PI * 2,
+          d = Math.sqrt(r()) * 0.36 * size;
+        const p = iso.p(Math.cos(a) * d, Math.sin(a) * d);
+        if (r() < 0.35) {
+          ctx.save();
+          ctx.translate(p.x, p.y - 2);
+          ctx.rotate(r() * 3);
+          ctx.fillStyle = '#7a4b25';
+          ctx.fillRect(-6, -1.6, 12, 3.2);
+          ctx.strokeStyle = INK;
+          ctx.lineWidth = 0.9;
+          ctx.strokeRect(-6, -1.6, 12, 3.2);
+          ctx.restore();
+        } else {
+          const rr = 2.5 + r() * 3.5;
+          ctx.beginPath();
+          ctx.moveTo(p.x - rr, p.y);
+          ctx.lineTo(p.x - rr * 0.4, p.y - rr);
+          ctx.lineTo(p.x + rr * 0.7, p.y - rr * 0.8);
+          ctx.lineTo(p.x + rr, p.y);
+          ctx.closePath();
+          ctx.fillStyle = css(tone(0x9a958c, 0.85 + r() * 0.3));
+          ctx.fill();
+          ctx.strokeStyle = INK;
+          ctx.lineWidth = 0.9;
+          ctx.stroke();
+        }
+      }
+    },
+    (ctx) => {
+      const c = { x: w / 2, y: h - 2 - (size * TH) / 2 };
+      softShadow(ctx, c.x, c.y, size * TW * 0.34, size * TH * 0.4, 0.55);
+    },
+    0.9,
+  );
 }
-
-interface UnitLook {
-  body: number;
-  size: number;
-  flying?: boolean;
-  weapon?: 'sword' | 'bow' | 'shield' | 'staff' | 'bone';
-}
-
-const UNITS: Record<string, UnitLook> = {
-  swordsman: { body: 0x3b82f6, size: 1, weapon: 'sword' },
-  archer: { body: 0x16a34a, size: 0.95, weapon: 'bow' },
-  bulwark: { body: 0x92400e, size: 1.5, weapon: 'shield' },
-  skeleton: { body: 0xe5e7eb, size: 0.85, weapon: 'bone' },
-};
 
 export function unitTexture(scene: Phaser.Scene, defId: string, team = 0): string {
+  const sprite = unitSpriteOf(defId);
+  if (sprite) {
+    if (scene.textures.exists(sprite.key)) return sprite.key;
+    queueSprite(scene, sprite);
+  }
   const key = `u:${defId}:${team}`;
   if (scene.textures.exists(key)) return key;
-  const look = UNITS[defId] ?? { body: 0xa855f7, size: 1.1, weapon: 'staff' as const };
-  const s = look.size;
-  const w = 48;
-  const h = 56;
-  const g = scene.make.graphics({}, false);
-  const cx = w / 2;
-  const base = h - 8;
-  g.fillStyle(0x000000, 0.25);
-  g.fillEllipse(cx, base, 18 * s, 8 * s);
-  const body = team === 1 ? 0xdc2626 : look.body;
-  g.fillStyle(shade(body, 0.75), 1);
-  g.fillRoundedRect(cx - 6 * s, base - 18 * s, 12 * s, 16 * s, 4 * s);
-  g.fillStyle(body, 1);
-  g.fillRoundedRect(cx - 6 * s, base - 18 * s, 7 * s, 16 * s, 3 * s);
-  g.fillStyle(0xf1c27d, 1);
-  g.fillCircle(cx, base - 22 * s, 5 * s);
-  g.lineStyle(1, OUTLINE, 0.6);
-  g.strokeCircle(cx, base - 22 * s, 5 * s);
-  g.lineStyle(2 * s, 0xdddddd, 1);
-  switch (look.weapon) {
-    case 'sword':
-      g.lineBetween(cx + 6 * s, base - 10 * s, cx + 13 * s, base - 22 * s);
-      break;
-    case 'bow':
-      g.lineStyle(2, 0x8b5a2b, 1);
-      g.beginPath();
-      g.arc(cx + 7 * s, base - 14 * s, 7 * s, -1.2, 1.2);
-      g.strokePath();
-      break;
-    case 'shield':
-      g.fillStyle(0x9ca3af, 1);
-      g.fillRoundedRect(cx + 3 * s, base - 18 * s, 8 * s, 12 * s, 3);
-      break;
-    case 'bone':
-      g.lineStyle(2, 0xffffff, 1);
-      g.lineBetween(cx + 5 * s, base - 8 * s, cx + 10 * s, base - 18 * s);
-      break;
-    default:
-      g.lineStyle(2, 0x6b4423, 1);
-      g.lineBetween(cx + 7 * s, base - 4 * s, cx + 7 * s, base - 26 * s);
-      g.fillStyle(0xa5f3fc, 1);
-      g.fillCircle(cx + 7 * s, base - 27 * s, 3);
-  }
-  g.generateTexture(key, w, h);
-  g.destroy();
-  return key;
+  const art = UNITS[defId] ?? FALLBACK_UNIT;
+  // Scenes anchor units at 86% of the texture height.
+  const base = Math.round(art.h * 0.86);
+  return makeTexture(
+    scene,
+    key,
+    art.w,
+    art.h,
+    (ctx) => art.draw(ctx, art.w / 2, base, team),
+    art.flying ? undefined : (ctx) => drawUnitShadow(ctx, art.w / 2, base, art.w),
+    1.3,
+  );
 }
 
 export function effectTextures(scene: Phaser.Scene) {
@@ -467,16 +322,20 @@ export function effectTextures(scene: Phaser.Scene) {
   g.strokeCircle(32, 32, 28);
   g.generateTexture('fx:ring', 64, 64);
   g.clear();
-  g.fillStyle(0x3a2a1a, 1);
-  g.fillRect(0, 1, 14, 3);
-  g.fillStyle(0x777777, 1);
-  g.fillTriangle(14, 0, 18, 2.5, 14, 5);
-  g.generateTexture('fx:bolt', 18, 5);
+  g.fillStyle(0x2a1a0e, 1);
+  g.fillRect(0, 0, 15, 5);
+  g.fillStyle(0x7a4b25, 1);
+  g.fillRect(1, 1, 13, 3);
+  g.fillStyle(0xd6dbe0, 1);
+  g.fillTriangle(14, -0.5, 19, 2.5, 14, 5.5);
+  g.generateTexture('fx:bolt', 20, 6);
   g.clear();
   g.lineStyle(1.5, 0x5a3b1e, 1);
   g.lineBetween(0, 2, 12, 2);
-  g.fillStyle(0xdddddd, 1);
+  g.fillStyle(0xe4e8ec, 1);
   g.fillTriangle(12, 0, 15, 2, 12, 4);
+  g.fillStyle(0xd23b2c, 1);
+  g.fillTriangle(0, 0, 3, 2, 0, 4);
   g.generateTexture('fx:arrow', 16, 4);
   g.clear();
   g.fillStyle(0xfff59d, 1);
@@ -486,48 +345,231 @@ export function effectTextures(scene: Phaser.Scene) {
   g.destroy();
 }
 
-/** The grass map with the deploy-only border, rendered once into a texture. */
+/** The grass clearing, forest edge and deploy border, rendered once. */
 export function groundTexture(
   scene: Phaser.Scene,
   mapSize: number,
   buildMin: number,
   buildMax: number,
 ): string {
-  const key = `ground:${mapSize}`;
+  const scenery = (id: string) => {
+    const k = `sc:s:${id}`;
+    return scene.textures.exists(k)
+      ? (scene.textures.get(k).getSourceImage() as CanvasImageSource & { width: number; height: number })
+      : null;
+  };
+  const fan = !!scenery('tree_large');
+  const key = `ground:${mapSize}${fan ? ':sc' : ''}`;
   if (scene.textures.exists(key)) return key;
-  const w = mapSize * TW;
-  const h = mapSize * TH;
-  const g = scene.make.graphics({}, false);
-  let seed = 7;
-  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  for (let y = 0; y < mapSize; y++) {
-    for (let x = 0; x < mapSize; x++) {
-      const inside = x >= buildMin && y >= buildMin && x < buildMax && y < buildMax;
-      const checker = (x + y) % 2 === 0;
-      const base = inside ? (checker ? 0x6fae4f : 0x68a649) : checker ? 0x5c9440 : 0x568c3b;
-      const c = shade(base, 0.96 + rnd() * 0.08);
-      const px = w / 2 + ((x - y) * TW) / 2;
-      const py = ((x + y) * TH) / 2;
-      g.fillStyle(c, 1);
-      g.beginPath();
-      g.moveTo(px, py);
-      g.lineTo(px + TW / 2, py + TH / 2);
-      g.lineTo(px, py + TH);
-      g.lineTo(px - TW / 2, py + TH / 2);
-      g.closePath();
-      g.fillPath();
-      if (!inside && rnd() < 0.18) {
-        g.fillStyle(0x2f6b2f, 1);
-        g.fillTriangle(px - 7, py + TH / 2 + 4, px + 7, py + TH / 2 + 4, px, py - 12);
-        g.fillStyle(0x3d8a3d, 1);
-        g.fillTriangle(px - 5, py + TH / 2 - 4, px + 5, py + TH / 2 - 4, px, py - 18);
-      } else if (inside && rnd() < 0.04) {
-        g.fillStyle(0x8fcf6f, 1);
-        g.fillEllipse(px + (rnd() - 0.5) * 20, py + TH / 2, 5, 2);
+  const w = mapSize * TW,
+    h = mapSize * TH;
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d')!;
+  ctx.lineJoin = 'round';
+  const r = rng(7);
+  const tile = (x: number, y: number) => ({ x: w / 2 + ((x - y) * TW) / 2, y: ((x + y) * TH) / 2 });
+  const diamond = (x0: number, y0: number, x1: number, y1: number) => {
+    const a = tile(x0, y0),
+      b = tile(x1, y0),
+      c = tile(x1, y1),
+      d = tile(x0, y1);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.lineTo(c.x, c.y);
+    ctx.lineTo(d.x, d.y);
+    ctx.closePath();
+  };
+
+  // Forest floor beyond the map.
+  ctx.fillStyle = '#3f7a2a';
+  ctx.fillRect(0, 0, w, h);
+  // Meadow: the deploy border is a shade darker than the village clearing.
+  diamond(0, 0, mapSize, mapSize);
+  ctx.fillStyle = '#6aac3c';
+  ctx.fill();
+  diamond(buildMin, buildMin, buildMax, buildMax);
+  const mid = tile(mapSize / 2, mapSize / 2);
+  const g = ctx.createRadialGradient(mid.x, mid.y, 40, mid.x, mid.y, w * 0.42);
+  g.addColorStop(0, '#8fca4c');
+  g.addColorStop(1, '#7db943');
+  ctx.fillStyle = g;
+  ctx.fill();
+  // Soft light and shade patches.
+  ctx.save();
+  diamond(0, 0, mapSize, mapSize);
+  ctx.clip();
+  for (let i = 0; i < mapSize * 3; i++) {
+    const p = tile(r() * mapSize, r() * mapSize);
+    const rad = 30 + r() * 70;
+    const light = r() < 0.5;
+    const pg = ctx.createRadialGradient(p.x, p.y, 2, p.x, p.y, rad);
+    pg.addColorStop(0, light ? 'rgba(190,230,120,0.16)' : 'rgba(30,70,20,0.14)');
+    pg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = pg;
+    ctx.beginPath();
+    ctx.ellipse(p.x, p.y, rad, rad / 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // Faint placement grid inside the clearing.
+  for (let y = buildMin; y < buildMax; y++)
+    for (let x = buildMin; x < buildMax; x++)
+      if ((x + y) % 2 === 0) {
+        diamond(x, y, x + 1, y + 1);
+        ctx.fillStyle = 'rgba(255,255,200,0.045)';
+        ctx.fill();
       }
+  // Grass tufts and flowers.
+  for (let i = 0; i < mapSize * mapSize * 5; i++) {
+    const tx = r() * mapSize,
+      ty = r() * mapSize;
+    const p = tile(tx, ty);
+    const inside = tx >= buildMin && ty >= buildMin && tx < buildMax && ty < buildMax;
+    const c = r();
+    ctx.strokeStyle = c < 0.5 ? (inside ? '#8fcd5e' : '#78b44c') : inside ? '#5c9a3c' : '#4c8534';
+    ctx.lineWidth = 1.1;
+    ctx.beginPath();
+    ctx.moveTo(p.x - 2, p.y);
+    ctx.lineTo(p.x - 3, p.y - 3.5);
+    ctx.moveTo(p.x, p.y);
+    ctx.lineTo(p.x, p.y - 4.5);
+    ctx.moveTo(p.x + 2, p.y);
+    ctx.lineTo(p.x + 3, p.y - 3);
+    ctx.stroke();
+    if (r() < 0.012) {
+      ctx.fillStyle = r() < 0.5 ? '#fff6d8' : '#ffd34d';
+      ctx.beginPath();
+      ctx.arc(p.x + 4, p.y - 2, 1.6, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
-  g.generateTexture(key, w, h);
-  g.destroy();
+  // Edge of the clearing: a soft band marking where building stops.
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(40,80,25,0.18)';
+  diamond(buildMin, buildMin, buildMax, buildMax);
+  ctx.stroke();
+  ctx.restore();
+
+  // Trees and rocks: in the deploy border sparsely, beyond the map densely.
+  const props: { x: number; y: number; kind: number; s: number }[] = [];
+  for (let y = -4; y < mapSize + 4; y++)
+    for (let x = -4; x < mapSize + 4; x++) {
+      const onMap = x >= 0 && y >= 0 && x < mapSize && y < mapSize;
+      const inside = x >= buildMin - 1 && y >= buildMin - 1 && x <= buildMax && y <= buildMax;
+      if (inside) continue;
+      const chance = onMap ? 0.07 : 0.55;
+      if (r() > chance) continue;
+      const p = tile(x + 0.5 + (r() - 0.5) * 0.6, y + 0.5 + (r() - 0.5) * 0.6);
+      if (p.x < -40 || p.x > w + 40 || p.y < -20 || p.y > h + 60) continue;
+      props.push({ x: p.x, y: p.y, kind: onMap && r() < 0.35 ? 2 : r() < 0.4 ? 1 : 0, s: 0.8 + r() * 0.5 });
+    }
+  props.sort((a, b) => a.y - b.y);
+  // Fan kit obstacles when loaded; procedural trees and rocks otherwise.
+  const trees = ['tree_large', 'tree_medium', 'pine', 'tree_medium', 'bush'].map(scenery).filter((x) => !!x);
+  const rocks = ['rock_large', 'rock_1', 'rock_3', 'bush', 'mushroom', 'trunk']
+    .map(scenery)
+    .filter((x) => !!x);
+  for (const p of props) {
+    if (fan) {
+      const pool = p.kind === 2 ? rocks : trees;
+      const img = pool[Math.floor(r() * pool.length)]!;
+      const sc = 0.75 + p.s * 0.25;
+      softShadow(ctx, p.x + 8 * sc, p.y + 2, img.width * 0.42 * sc, img.width * 0.16 * sc, 0.3);
+      ctx.drawImage(
+        img,
+        p.x - (img.width * sc) / 2,
+        p.y - img.height * sc * 0.92,
+        img.width * sc,
+        img.height * sc,
+      );
+    } else if (p.kind === 2) groundRock(ctx, p.x, p.y, 5 * p.s);
+    else if (p.kind === 1) pine(ctx, p.x, p.y, p.s);
+    else roundTree(ctx, p.x, p.y, p.s, r);
+  }
+  scene.textures.addCanvas(key, canvas);
   return key;
+}
+
+function roundTree(ctx: Ctx, x: number, y: number, s: number, r: () => number) {
+  softShadow(ctx, x + 6 * s, y + 2, 16 * s, 7 * s, 0.35);
+  ctx.fillStyle = '#6b4423';
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 1.2;
+  ctx.fillRect(x - 2.5 * s, y - 12 * s, 5 * s, 12 * s);
+  ctx.strokeRect(x - 2.5 * s, y - 12 * s, 5 * s, 12 * s);
+  const blobs: [number, number, number][] = [
+    [-7, -18, 9],
+    [7, -19, 9],
+    [0, -27, 11],
+    [-2, -17, 9],
+  ];
+  const base = r() < 0.5 ? 0x3f8a36 : 0x4a9a3a;
+  // Outline pass, then fills, then highlights, so blobs merge into one crown.
+  ctx.fillStyle = INK;
+  for (const [dx, dy, rr] of blobs) {
+    ctx.beginPath();
+    ctx.arc(x + dx * s, y + dy * s, rr * s + 1.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  for (const [dx, dy, rr] of blobs) {
+    const gg = ctx.createRadialGradient(
+      x + (dx - 3) * s,
+      y + (dy - 4) * s,
+      1,
+      x + dx * s,
+      y + dy * s,
+      rr * s,
+    );
+    gg.addColorStop(0, css(tone(base, 1.3)));
+    gg.addColorStop(1, css(tone(base, 0.8)));
+    ctx.fillStyle = gg;
+    ctx.beginPath();
+    ctx.arc(x + dx * s, y + dy * s, rr * s, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function pine(ctx: Ctx, x: number, y: number, s: number) {
+  softShadow(ctx, x + 6 * s, y + 2, 13 * s, 6 * s, 0.35);
+  ctx.fillStyle = '#5a3b1e';
+  ctx.fillRect(x - 2 * s, y - 8 * s, 4 * s, 8 * s);
+  for (let i = 0; i < 3; i++) {
+    const ty = y - 6 * s - i * 9 * s,
+      wd = (13 - i * 3) * s;
+    ctx.beginPath();
+    ctx.moveTo(x - wd, ty);
+    ctx.lineTo(x, ty - 15 * s);
+    ctx.lineTo(x + wd, ty);
+    ctx.quadraticCurveTo(x, ty + 4 * s, x - wd, ty);
+    ctx.closePath();
+    const gg = ctx.createLinearGradient(x - wd, 0, x + wd, 0);
+    gg.addColorStop(0, '#3e8a3e');
+    gg.addColorStop(0.45, '#2f7a34');
+    gg.addColorStop(1, '#1f5a28');
+    ctx.fillStyle = gg;
+    ctx.fill();
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = INK;
+    ctx.stroke();
+  }
+}
+
+function groundRock(ctx: Ctx, x: number, y: number, rr: number) {
+  softShadow(ctx, x + 2, y + 1, rr * 1.4, rr * 0.6, 0.3);
+  ctx.beginPath();
+  ctx.moveTo(x - rr, y);
+  ctx.quadraticCurveTo(x - rr, y - rr, x, y - rr * 1.1);
+  ctx.quadraticCurveTo(x + rr, y - rr, x + rr, y);
+  ctx.quadraticCurveTo(x, y + rr * 0.4, x - rr, y);
+  ctx.fillStyle = '#9a958c';
+  ctx.fill();
+  ctx.lineWidth = 1.1;
+  ctx.strokeStyle = INK;
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(x - rr * 0.3, y - rr * 0.6, rr * 0.35, rr * 0.18, -0.3, 0, Math.PI * 2);
+  ctx.fill();
 }

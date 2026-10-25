@@ -144,7 +144,7 @@ export async function requestReinforcements(sql: Sql, deps: Deps, userId: string
     const capacity =
       reinforcementCapacity(p.state) -
       p.state.reinforcements.reduce((s, r) => s + (getContent().troops[r.id]?.housing ?? 0) * r.count, 0);
-    if (capacity <= 0) throw conflict('capacity', 'Build a Clan Hall and make room for reinforcements');
+    if (capacity <= 0) throw conflict('capacity', 'Build a Banner Hall and make room for reinforcements');
     const [prev] =
       await tx`select * from game.reinforcement_requests where user_id=${userId} order by created_at desc limit 1`;
     if (prev && !prev.claimed) return { id: prev.id };

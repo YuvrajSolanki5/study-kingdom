@@ -51,7 +51,7 @@ function spellLevels(library: number[], power: number[], duration: number[], cos
 export const troops: TroopDef[] = [
   {
     id: 'swordsman',
-    name: 'Swordsman',
+    name: 'Squire',
     role: 'Melee attacker',
     description: 'Cheap, fast to train and charges the nearest building.',
     housing: 1,
@@ -68,7 +68,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'archer',
-    name: 'Archer',
+    name: 'Fletcher',
     role: 'Ranged attacker',
     description: 'Fragile but shoots over walls and can hit air units.',
     housing: 1,
@@ -85,7 +85,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'bulwark',
-    name: 'Bulwark',
+    name: 'Ironhide',
     role: 'Tank',
     description: 'Slow and sturdy. Ignores everything except defences, soaking up their fire.',
     housing: 5,
@@ -102,7 +102,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'sapper',
-    name: 'Sapper',
+    name: 'Powder Sapper',
     role: 'Wall breaker',
     description: 'Runs at the nearest wall and blows a hole in it — and itself.',
     housing: 2,
@@ -122,7 +122,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'looter',
-    name: 'Looter',
+    name: 'Pilferer',
     role: 'Resource raider',
     description: 'Sprints for storage buildings and deals double damage to them.',
     housing: 1,
@@ -140,7 +140,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'wyvern',
-    name: 'Wyvern',
+    name: 'Glidewing',
     role: 'Flyer',
     description: 'A quick flying skirmisher that ignores walls entirely.',
     housing: 2,
@@ -157,7 +157,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'mage',
-    name: 'Mage',
+    name: 'Spellslinger',
     role: 'Splash attacker',
     description: 'Fireballs hit everything in a small area, ground or air.',
     housing: 4,
@@ -175,7 +175,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'skyship',
-    name: 'Skyship',
+    name: 'Skybarge',
     role: 'Bomber',
     description: 'A slow airship that drops heavy bombs on defences, and one last bomb when downed.',
     housing: 5,
@@ -194,7 +194,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'vaulter',
-    name: 'Vaulter',
+    name: 'Wallhopper',
     role: 'Wall jumper',
     description: 'Pole-vaults over walls to strike defences directly.',
     housing: 5,
@@ -212,7 +212,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'drake',
-    name: 'Drake',
+    name: 'Elder Drake',
     role: 'Heavy air damage',
     description: 'A huge flying beast whose breath scorches ground and air alike.',
     housing: 20,
@@ -230,7 +230,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'mender',
-    name: 'Mender',
+    name: 'Lightwing',
     role: 'Healer',
     description: 'Flies behind your ground troops and heals everyone nearby. Cannot attack.',
     housing: 14,
@@ -248,7 +248,7 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'necromancer',
-    name: 'Necromancer',
+    name: 'Bonecaller',
     role: 'Summoner',
     description: 'Raises skeleton warriors that swarm the nearest buildings.',
     housing: 12,
@@ -266,9 +266,9 @@ export const troops: TroopDef[] = [
   },
   {
     id: 'skeleton',
-    name: 'Skeleton',
+    name: 'Rattlebones',
     role: 'Summoned',
-    description: 'Raised by a Necromancer. Weak alone, dangerous in numbers.',
+    description: 'Raised by a Bonecaller. Weak alone, dangerous in numbers.',
     housing: 1,
     flying: false,
     preference: 'any',
@@ -288,7 +288,7 @@ export const troops: TroopDef[] = [
 export const spells: SpellDef[] = [
   {
     id: 'thunder',
-    name: 'Thunder',
+    name: 'Thunderclap',
     description: 'Three lightning strikes damage every building in a small area.',
     housing: 1,
     brewSeconds: 5 * MIN,
@@ -298,7 +298,7 @@ export const spells: SpellDef[] = [
   },
   {
     id: 'mending',
-    name: 'Mending',
+    name: 'Mending Mist',
     description: 'A healing ring that restores your troops over twelve seconds.',
     housing: 2,
     brewSeconds: 6 * MIN,
@@ -308,7 +308,7 @@ export const spells: SpellDef[] = [
   },
   {
     id: 'fury',
-    name: 'Fury',
+    name: 'War Cry',
     description: 'Troops inside the ring hit harder and move faster.',
     housing: 2,
     brewSeconds: 6 * MIN,
@@ -318,7 +318,7 @@ export const spells: SpellDef[] = [
   },
   {
     id: 'frost',
-    name: 'Frost',
+    name: 'Frostbind',
     description: 'Freezes defences and defending troops in place for a few seconds.',
     housing: 1,
     brewSeconds: 8 * MIN,
@@ -328,7 +328,7 @@ export const spells: SpellDef[] = [
   },
   {
     id: 'leap',
-    name: 'Leap',
+    name: 'Skystep',
     description: 'Ground troops inside the ring can hop straight over walls.',
     housing: 2,
     brewSeconds: 6 * MIN,
@@ -338,7 +338,7 @@ export const spells: SpellDef[] = [
   },
   {
     id: 'aegis',
-    name: 'Aegis',
+    name: 'Aegis Ward',
     description: 'A protective dome: troops inside take much less damage.',
     housing: 2,
     brewSeconds: 8 * MIN,
@@ -374,11 +374,11 @@ function heroLevels(
 export const heroes: HeroDef[] = [
   {
     id: 'warlord',
-    name: 'Warlord',
+    name: 'Warlord Brannoc',
     role: 'Offensive hero',
     description: 'A towering melee champion who smashes through the heart of a base.',
     abilityName: 'War Cry',
-    abilityDescription: 'Heals the Warlord and enrages him and nearby troops for a few seconds.',
+    abilityDescription: 'Heals Warlord Brannoc and enrages him and nearby troops for a few seconds.',
     speed: 1.6,
     range: 0.6,
     attackSeconds: 1,
@@ -399,7 +399,7 @@ export const heroes: HeroDef[] = [
   },
   {
     id: 'sage',
-    name: 'Sage',
+    name: 'Sage Elowen',
     role: 'Support hero',
     description: 'A ranged guardian whose aura strengthens every troop nearby.',
     abilityName: 'Sanctuary',
@@ -429,9 +429,8 @@ export const heroes: HeroDef[] = [
 export const siege: SiegeDef[] = [
   {
     id: 'battering_ram',
-    name: 'Battering Ram',
-    description:
-      'Rolls straight for the Headquarters, smashing walls. Releases your clan troops when it breaks.',
+    name: 'Gatebreaker',
+    description: 'Rolls straight for the Keep, smashing walls. Releases your clan troops when it breaks.',
     speed: 1,
     attackSeconds: 1,
     buildSeconds: 20 * MIN,

@@ -20,7 +20,19 @@ import { sfx } from './audio.ts';
 import { attachControls, frameMap } from './camera.ts';
 import { depthOf, isoX, isoY, TH, toTile, TW } from './iso.ts';
 import { exposeScene } from './testHooks.ts';
-import { buildingTexture, effectTextures, groundTexture, rubbleTexture, unitTexture } from './textures.ts';
+import {
+  buildingTexture,
+  effectTextures,
+  facesLeft,
+  fitSprite,
+  groundTexture,
+  isFanArt,
+  preloadBuildings,
+  preloadScenery,
+  preloadUnits,
+  rubbleTexture,
+  unitTexture,
+} from './textures.ts';
 
 export interface BattleSceneData {
   setup: BattleSetup;
@@ -79,6 +91,12 @@ export class BattleScene extends Phaser.Scene {
     this.ending = false;
   }
 
+  preload() {
+    preloadBuildings(this, this.rt.infos);
+    preloadUnits(this);
+    preloadScenery(this);
+  }
+
   create() {
     effectTextures(this);
     const { size, buildMin, buildMax } = this.content.map;
@@ -95,7 +113,7 @@ export class BattleScene extends Phaser.Scene {
         isoY(info.x + info.size, info.y + info.size),
         key,
       );
-      img.setOrigin(0.5, (img.height - 2) / img.height).setDepth(depthOf(info.x, info.y, 2 * info.size));
+      fitSprite(img).setDepth(depthOf(info.x, info.y, 2 * info.size));
       const st = this.rt.state.buildings[info.index]!;
       if (info.isTrap || !st.revealed) img.setVisible(false);
       if (info.off) img.setTint(0xb0b0b0);
@@ -285,8 +303,13 @@ export class BattleScene extends Phaser.Scene {
         case 'spawn': {
           const u = st.units[ev.u]!;
           const stats = this.rt.stats.get(u.key)!;
-          const img = this.add.image(0, 0, unitTexture(this, stats.defId, u.team)).setOrigin(0.5, 0.86);
-          if (stats.kind === 'hero') img.setScale(1.35);
+          const img = fitSprite(
+            this.add.image(0, 0, unitTexture(this, stats.defId, u.team)),
+            stats.kind === 'hero' ? 1.35 : 1,
+            0.86,
+          );
+          // Defending clan troops: procedural art wears red; fan art is tinted.
+          if (u.team === 1 && isFanArt(img)) img.setTint(0xff9b9b);
           this.uSprites.set(u.id, img);
           if (stats.flying) this.shadows.set(u.id, this.add.ellipse(0, 0, 18, 8, 0x000000, 0.25));
           this.prev.set(u.id, [u.x, u.y]);
@@ -297,7 +320,7 @@ export class BattleScene extends Phaser.Scene {
           const u = st.units[ev.u]!;
           const from = this.bSprites[ev.b]!;
           const to = this.screenOf(u.x, u.y);
-          const fromY = from.y - from.height * from.originY * 0.7;
+          const fromY = from.y - from.displayHeight * from.originY * 0.7;
           const tex =
             info.defense && info.defense.splash > 0
               ? 'fx:dot'
@@ -417,7 +440,7 @@ export class BattleScene extends Phaser.Scene {
             });
             sfx('boom');
           }
-          img.setOrigin(0.5, (img.height - 2) / img.height).setDepth(depthOf(info.x, info.y, 0));
+          fitSprite(img).setDepth(depthOf(info.x, info.y, 0));
           break;
         }
         case 'udie': {
@@ -444,8 +467,9 @@ export class BattleScene extends Phaser.Scene {
         }
         case 'reveal': {
           const img = this.bSprites[ev.b]!;
-          img.setVisible(true).setScale(0.2);
-          this.tweens.add({ targets: img, scale: 1, duration: 300, ease: 'Back.Out' });
+          const full = img.scaleX;
+          img.setVisible(true).setScale(full * 0.2);
+          this.tweens.add({ targets: img, scale: full, duration: 300, ease: 'Back.Out' });
           break;
         }
         case 'ability':
@@ -487,12 +511,12 @@ export class BattleScene extends Phaser.Scene {
       const flying = this.rt.stats.get(u.key)?.flying;
       img.setPosition(s.sx, s.sy - (flying ? FLY_HEIGHT : 0));
       img.setDepth(flying ? 90000 + s.d : s.d);
-      img.setFlipX(u.x < px);
+      if (u.x !== px) img.setFlipX(u.x < px !== facesLeft(img));
       const shadow = this.shadows.get(u.id);
       shadow?.setPosition(s.sx, s.sy).setDepth(s.d - 1);
       if (u.hp < u.maxHp) {
         const w = 18;
-        const by = s.sy - (flying ? FLY_HEIGHT : 0) - 30;
+        const by = img.y - img.displayHeight * img.originY - 4;
         g.fillStyle(0x111827, 0.8);
         g.fillRect(s.sx - w / 2 - 1, by - 1, w + 2, 4);
         g.fillStyle(u.team === 0 ? 0x4ade80 : 0xf87171, 1);
@@ -504,7 +528,7 @@ export class BattleScene extends Phaser.Scene {
       if (b.dead || b.hp >= info.maxHp || info.isTrap) return;
       const img = this.bSprites[i]!;
       const w = Math.min(60, info.size * 16);
-      const by = img.y - img.height * img.originY + 6;
+      const by = img.y - img.displayHeight * img.originY + 6;
       g.fillStyle(0x111827, 0.8);
       g.fillRect(img.x - w / 2 - 1, by - 1, w + 2, 5);
       g.fillStyle(info.isWall ? 0xd1d5db : 0xfbbf24, 1);

@@ -6,7 +6,14 @@ import { sfx } from './audio.ts';
 import { attachControls, frameMap } from './camera.ts';
 import { depthOf, isoX, isoY, TH, toTile, TW } from './iso.ts';
 import { exposeScene } from './testHooks.ts';
-import { buildingTexture, groundTexture } from './textures.ts';
+import {
+  buildingTexture,
+  fitSprite,
+  groundTexture,
+  preloadBuildings,
+  preloadScenery,
+  SPRITES_READY,
+} from './textures.ts';
 
 interface Drag {
   id: number;
@@ -34,6 +41,12 @@ export class VillageScene extends Phaser.Scene {
     super('village');
   }
 
+  preload() {
+    const state = this.state();
+    if (state) preloadBuildings(this, state.buildings);
+    preloadScenery(this);
+  }
+
   create() {
     const view = useGame.getState().view;
     this.content = contentOf(view);
@@ -56,9 +69,11 @@ export class VillageScene extends Phaser.Scene {
         this.sync();
       if (s.placing !== prev.placing) this.setGhost(s.placing);
     });
+    const redraw = () => this.sync();
     const stop = () => {
       this.unsub?.();
       this.unsub = null;
+      this.events.off(SPRITES_READY, redraw);
     };
     this.events.once('shutdown', stop);
     this.events.once('destroy', stop);
@@ -67,6 +82,8 @@ export class VillageScene extends Phaser.Scene {
       move: (p) => this.onMove(p),
       up: (p, tap) => this.onUp(p, tap),
     });
+    // Upgrades and visits can need sprites that load after create().
+    this.events.on(SPRITES_READY, redraw);
     this.scale.on('resize', () => this.cameras.main.setSize(this.scale.width, this.scale.height));
     exposeScene(this, 'village');
   }
@@ -86,13 +103,15 @@ export class VillageScene extends Phaser.Scene {
   private placeSprite(img: Phaser.GameObjects.Image, b: { defId: string; x: number; y: number }) {
     const s = this.content.structures[b.defId]?.size ?? 1;
     img.setPosition(isoX(b.x + s, b.y + s), isoY(b.x + s, b.y + s));
-    img.setOrigin(0.5, (img.height - 2) / img.height);
+    fitSprite(img);
     img.setDepth(depthOf(b.x, b.y, 2 * s));
   }
 
   sync() {
     const state = this.state();
-    if (!state || !this.sys?.isActive()) return;
+    // isActive() is false during create(), so the first draw would be skipped.
+    const status = this.sys?.settings.status;
+    if (!state || (status !== Phaser.Scenes.CREATING && status !== Phaser.Scenes.RUNNING)) return;
     const { selected, editMode } = useGame.getState();
     const seen = new Set<number>();
     for (const b of state.buildings) {

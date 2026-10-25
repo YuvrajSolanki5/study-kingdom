@@ -199,8 +199,8 @@ function StartForm() {
         </span>
         {roomGold < estGold ? (
           <span className="warn small">
-            Your Treasury only has room for {roomGold} more Gold — spend some or upgrade storage so nothing is
-            wasted.
+            Your Gilded Vault only has room for {roomGold} more Gold — spend some or upgrade storage so
+            nothing is wasted.
           </span>
         ) : null}
       </div>

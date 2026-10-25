@@ -13,7 +13,7 @@ import {
   type QueueItem,
 } from '@sk/rules';
 import { contentOf, useGame } from '../../state/store.ts';
-import { Button, CostView, Countdown, Panel, Progress } from '../common.tsx';
+import { Button, CostView, Countdown, Icon, Panel, Progress } from '../common.tsx';
 import { fmtDuration } from '../format.ts';
 
 export function ArmyPanel() {
@@ -104,7 +104,8 @@ function TroopCard({
   return (
     <div className={`unit-card ${locked ? 'locked' : ''}`}>
       <div className="row between">
-        <strong>{def.name}</strong>
+        <Icon name={def.id} size={44} className="unit-art" />
+        <strong className="grow">{def.name}</strong>
         <span className="tag">Lv {level}</span>
       </div>
       <span className="muted small">{def.role}</span>
@@ -112,7 +113,7 @@ function TroopCard({
         ❤ {lvl.hp} · ⚔ {(lvl.damage / def.attackSeconds).toFixed(0)}/s · 🏠 {def.housing}
       </span>
       {locked ? (
-        <span className="small warn">Barracks level {def.barracksLevel}</span>
+        <span className="small warn">Muster Hall level {def.barracksLevel}</span>
       ) : (
         <>
           <span className="small">
@@ -164,12 +165,13 @@ function SpellCard({
   return (
     <div className={`unit-card ${locked ? 'locked' : ''}`}>
       <div className="row between">
-        <strong>{def.name}</strong>
+        <Icon name={def.id} size={44} className="unit-art" />
+        <strong className="grow">{def.name}</strong>
         <span className="tag">Lv {level}</span>
       </div>
       <span className="muted small">{def.description}</span>
       {locked ? (
-        <span className="small warn">Research Library {def.libraryLevel}</span>
+        <span className="small warn">Lorehouse {def.libraryLevel}</span>
       ) : (
         <>
           <span className="small">
@@ -286,7 +288,8 @@ function Research() {
           return (
             <div key={`${it.kind}:${it.id}`} className="unit-card">
               <div className="row between">
-                <strong>{it.name}</strong>
+                <Icon name={it.id} size={44} className="unit-art" />
+                <strong className="grow">{it.name}</strong>
                 <span className="tag">Lv {it.level}</span>
               </div>
               {next ? (

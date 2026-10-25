@@ -1,7 +1,68 @@
 import type { Cost } from '@sk/content';
 import { useEffect, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import sprites from '../game/sprite-index.json';
 import { serverNow, useGame } from '../state/store.ts';
 import { fmtDuration, fmtNumber } from './format.ts';
+
+// Interface art from the Supercell fan kit (docs/licensing.md), built by
+// scripts/assets/build-sprites.mjs. Callers pass a fallback for missing art.
+const ART = `${import.meta.env.BASE_URL}sprites/`;
+const INDEX = sprites as {
+  ui: Record<string, string>;
+  buildings: Record<string, ({ file: string } | null)[]>;
+};
+
+export function artUrl(name: string): string | null {
+  const f = INDEX.ui[name];
+  return f ? ART + f : null;
+}
+
+/** Thumbnail of a building at a level (its in-game sprite). */
+export function buildingArtUrl(defId: string, level = 1): string | null {
+  const list = INDEX.buildings[defId];
+  const e = list?.[Math.min(level, list.length) - 1];
+  return e ? ART + e.file : null;
+}
+
+export function Icon({
+  name,
+  size = 20,
+  fallback = null,
+  className = '',
+}: {
+  name: string;
+  size?: number;
+  fallback?: ReactNode;
+  className?: string;
+}) {
+  const url = artUrl(name);
+  if (!url) return <>{fallback}</>;
+  return (
+    <img
+      className={`art ${className}`}
+      src={url}
+      width={size}
+      height={size}
+      alt=""
+      aria-hidden
+      draggable={false}
+    />
+  );
+}
+
+/** League badge for a trophy count. */
+export function leagueOf(trophies: number): string {
+  const steps: [number, string][] = [
+    [4000, 'legend'],
+    [3200, 'titan'],
+    [2600, 'champion'],
+    [2000, 'master'],
+    [1400, 'crystal'],
+    [800, 'gold'],
+    [400, 'silver'],
+  ];
+  return `league_${steps.find(([t]) => trophies >= t)?.[1] ?? 'bronze'}`;
+}
 
 export function useServerNow(intervalMs = 1000): number {
   const [now, setNow] = useState(() => serverNow());
@@ -54,7 +115,7 @@ export function Panel({
       <header className="panel-head">
         <h2>{title}</h2>
         {onClose ? (
-          <button className="icon-btn" onClick={onClose} aria-label="Close">
+          <button className="close-btn" onClick={onClose} aria-label="Close">
             ✕
           </button>
         ) : null}
@@ -91,7 +152,7 @@ export function Modal({
 export function Gold({ n }: { n: number }) {
   return (
     <span className="res res-gold">
-      <i className="coin" aria-hidden />
+      <Icon name="gold" size={18} fallback={<i className="coin" aria-hidden />} />
       {fmtNumber(n)}
     </span>
   );
@@ -100,7 +161,7 @@ export function Gold({ n }: { n: number }) {
 export function Essence({ n }: { n: number }) {
   return (
     <span className="res res-essence">
-      <i className="drop" aria-hidden />
+      <Icon name="essence" size={18} fallback={<i className="drop" aria-hidden />} />
       {fmtNumber(n)}
     </span>
   );
