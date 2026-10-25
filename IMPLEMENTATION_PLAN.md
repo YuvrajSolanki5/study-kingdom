@@ -248,7 +248,7 @@ Study contributions unlock shared rewards; combat results decide the war. Start 
 - [ ] Run a two-week beta with several small friend groups.
 - [ ] Fix session-credit, combat, progression, and installation issues found during beta.
 
-Detailed remaining gates: `docs/beta.md`; recovery and monitoring: `docs/operations.md`. GitHub repository: `YuvrajSolanki5/study-kingdom`; Cloudflare and Supabase are deployed. CI and nightly encrypted backup workflows are configured; their first runs are part of release verification.
+Detailed remaining gates: `docs/beta.md`; recovery and monitoring: `docs/operations.md`. GitHub repository: `YuvrajSolanki5/study-kingdom`; Cloudflare and Supabase are deployed. CI passes on GitHub (fresh-checkout fixes, 25 October 2026). The nightly backup now runs as the read-only `game_backup` role via snapshot export (migration 5, applied to production); a manual run produced a verified archive, and the first scheduled run is part of release verification.
 
 Direct Mac distribution requires Developer ID signing and notarization for the normal installation experience, without App Store publication. Developer membership and signing credentials are release prerequisites.
 

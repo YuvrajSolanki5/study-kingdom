@@ -8,7 +8,7 @@ Local feature implementation includes the study-to-clan-war loop, twenty campaig
 - [x] Deploy Cloudflare, Supabase migrations without seeds, and the HMAC-protected Edge verifier; production account/study/battle checks pass.
 - [x] Replace email accounts with immediate username/password signup at the user’s request. Production registration, login and password changes pass; no SMTP/domain is needed.
 - [x] Exercise hosted recovery with generated local test fixtures: 25 matching tables, 46 accounts, 15 replay hashes, restored login and zero ledger mismatches. Approved read-only backup credentials and the encryption key are configured in GitHub.
-- [ ] Verify the first scheduled backup artifact and keep a separate offline copy of the local ignored `study-kingdom-backup.key`.
+- [ ] Verify the first scheduled backup artifact and keep a separate offline copy of the local ignored `study-kingdom-backup.key`. _(25 October 2026: a manual run as `game_backup` produced an archive that decrypts with the local key and contains all 23 game tables plus accounts. The scheduled 03:17 UTC run and the offline key copy remain.)_
 - [ ] Configure Apple Developer ID/notarization credentials if normal Gatekeeper installation is required. The downloadable beta DMGs are ad-hoc signed.
 
 ## Mac distribution checks
