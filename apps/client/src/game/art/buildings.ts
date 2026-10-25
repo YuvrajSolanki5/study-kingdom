@@ -7,6 +7,7 @@ import {
   footprint,
   INK,
   Iso,
+  paint,
   planks,
   rng,
   softShadow,
@@ -1436,4 +1437,25 @@ export function drawUnder(ctx: Ctx, spec: BuildingSpec, s: number, w: number, h:
   if (s > 1) softShadow(ctx, c.x + s * 6, c.y + 2, s * TW * 0.42, s * TH * 0.5, 0.34);
   else softShadow(ctx, c.x + 3, c.y + 1, 18, 8, 0.25);
   if (spec.patch) footprint(ctx, iso, (spec.patch * s) / 2);
+}
+
+const thumbs = new Map<string, string>();
+
+/** Data URL of a building's first-stage procedural art, for panels when it has no sprite. */
+export function buildingThumbnail(defId: string, size: number): string {
+  let url = thumbs.get(defId);
+  if (!url) {
+    const spec = SPECS[defId] ?? FALLBACK;
+    const w = size * TW + 8,
+      h = size * TH + spec.head;
+    url = paint(
+      w,
+      h,
+      (ctx) => drawBuilding(ctx, spec, size, w, h, 0, 0),
+      (ctx) => drawUnder(ctx, spec, size, w, h),
+      defId === 'wall' ? 1.1 : 1.6,
+    ).toDataURL();
+    thumbs.set(defId, url);
+  }
+  return url;
 }

@@ -10,6 +10,7 @@ import {
   buildingTexture,
   fitSprite,
   groundTexture,
+  padTexture,
   preloadBuildings,
   preloadScenery,
   SPRITES_READY,
@@ -28,6 +29,7 @@ interface Drag {
 export class VillageScene extends Phaser.Scene {
   private content!: GameContent;
   private sprites = new Map<number, Phaser.GameObjects.Image>();
+  private pads = new Map<number, Phaser.GameObjects.Image>();
   private overlay!: Phaser.GameObjects.Graphics;
   private ghost: Phaser.GameObjects.Image | null = null;
   private ghostPos: { x: number; y: number; valid: boolean } | null = null;
@@ -57,7 +59,8 @@ export class VillageScene extends Phaser.Scene {
       .setOrigin(0, 0)
       .setDepth(-10);
     this.overlay = this.add.graphics().setDepth(100000);
-    frameMap(this, size * TW, size * TH, (size * TH) / 2);
+    // Open on the whole build area so the village has room around it.
+    frameMap(this, size * TW, size * TH, (size * TH) / 2, 0.8);
     this.sync();
     this.unsub = useGame.subscribe((s, prev) => {
       if (
@@ -77,11 +80,15 @@ export class VillageScene extends Phaser.Scene {
     };
     this.events.once('shutdown', stop);
     this.events.once('destroy', stop);
-    attachControls(this, {
-      down: (p) => this.onDown(p),
-      move: (p) => this.onMove(p),
-      up: (p, tap) => this.onUp(p, tap),
-    });
+    attachControls(
+      this,
+      {
+        down: (p) => this.onDown(p),
+        move: (p) => this.onMove(p),
+        up: (p, tap) => this.onUp(p, tap),
+      },
+      size * TW,
+    );
     // Upgrades and visits can need sprites that load after create().
     this.events.on(SPRITES_READY, redraw);
     this.scale.on('resize', () => this.cameras.main.setSize(this.scale.width, this.scale.height));
@@ -107,6 +114,19 @@ export class VillageScene extends Phaser.Scene {
     img.setDepth(depthOf(b.x, b.y, 2 * s));
   }
 
+  /** Worn ground under buildings larger than one tile (not walls or traps). */
+  private placePad(id: number, b: { defId: string; x: number; y: number }) {
+    const s = this.content.structures[b.defId]?.size ?? 1;
+    if (s < 2) return;
+    let pad = this.pads.get(id);
+    if (!pad) {
+      pad = this.add.image(0, 0, padTexture(this, s)).setDepth(-5);
+      this.pads.set(id, pad);
+    }
+    pad.setPosition(isoX(b.x + s, b.y + s), isoY(b.x + s, b.y + s));
+    fitSprite(pad);
+  }
+
   sync() {
     const state = this.state();
     // isActive() is false during create(), so the first draw would be skipped.
@@ -122,7 +142,10 @@ export class VillageScene extends Phaser.Scene {
         img = this.add.image(0, 0, key);
         this.sprites.set(b.id, img);
       } else if (img.texture.key !== key) img.setTexture(key);
-      if (this.drag?.id !== b.id) this.placeSprite(img, b);
+      if (this.drag?.id !== b.id) {
+        this.placeSprite(img, b);
+        this.placePad(b.id, b);
+      }
       img.setTint(b.id === selected ? 0xfff2b3 : 0xffffff);
       img.setAlpha(editMode && this.drag && this.drag.id !== b.id ? 0.85 : 1);
     }
@@ -130,6 +153,12 @@ export class VillageScene extends Phaser.Scene {
       if (!seen.has(id)) {
         img.destroy();
         this.sprites.delete(id);
+      }
+    }
+    for (const [id, pad] of this.pads) {
+      if (!seen.has(id)) {
+        pad.destroy();
+        this.pads.delete(id);
       }
     }
     if (selected !== this.lastSelected && selected !== null) sfx('select');
@@ -237,6 +266,7 @@ export class VillageScene extends Phaser.Scene {
     const img = this.sprites.get(this.drag.id);
     if (img) {
       this.placeSprite(img, { defId: this.drag.defId, x, y });
+      this.placePad(this.drag.id, { defId: this.drag.defId, x, y });
       img.setDepth(99998).setTint(this.drag.valid ? 0xfff2b3 : 0xff6666);
     }
   }

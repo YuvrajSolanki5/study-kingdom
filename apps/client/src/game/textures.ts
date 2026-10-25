@@ -1,16 +1,17 @@
 import type { GameContent } from '@sk/content';
 import Phaser from 'phaser';
 import { drawBuilding, drawUnder, FALLBACK, SPECS } from './art/buildings.ts';
-import { css, type Ctx, INK, Iso, makeTexture, rng, softShadow, tone } from './art/canvas.ts';
+import { css, type Ctx, footprint, INK, Iso, makeTexture, rng, softShadow, tone } from './art/canvas.ts';
 import { drawUnitShadow, FALLBACK_UNIT, UNITS } from './art/units.ts';
 import { TH, TW } from './iso.ts';
 import sprites from './sprite-index.json';
 
-// Buildings use sprites derived from the Supercell fan kit when available
-// (scripts/assets/build-sprites.mjs, docs/licensing.md); everything else is
-// procedural Canvas 2D art drawn once and cached by key. Procedural building
-// textures are `size*TW + 8` wide with the ground diamond's bottom corner 2px
-// above the bottom edge. Always place sprites with fitSprite().
+// Buildings and units use sprites restyled from the Supercell fan kit when
+// available (scripts/assets/stylize-sprites.mjs, docs/licensing.md); walls,
+// traps and everything else are procedural Canvas 2D art drawn once and cached
+// by key. Procedural building textures are `size*TW + 8` wide with the ground
+// diamond's bottom corner 2px above the bottom edge. Always place sprites with
+// fitSprite().
 
 interface SpriteEntry {
   file: string;
@@ -20,8 +21,11 @@ interface SpriteEntry {
 }
 interface UnitEntry {
   file: string;
+  h: number;
   left: boolean;
   flying: boolean;
+  /** Transparent margin (source pixels) added on every side for the outline. */
+  pad: number;
 }
 interface SpriteMeta {
   scale: number;
@@ -53,7 +57,8 @@ function unitSpriteOf(defId: string) {
   const e = SPRITES.units[defId];
   if (!e) return null;
   // Feet sit at the bottom of the art; flyers hover a little above their anchor.
-  const meta = { scale: 1 / SPRITES.res, originY: e.flying ? 0.9 : 0.97, faceLeft: e.left };
+  const feet = e.pad + (e.flying ? 0.9 : 0.97) * (e.h - 2 * e.pad);
+  const meta = { scale: 1 / SPRITES.res, originY: feet / e.h, faceLeft: e.left };
   return { key: `sc:u:${defId}`, url: SPRITE_URL + e.file, meta };
 }
 
@@ -172,6 +177,26 @@ export function buildingTexture(
     (ctx) => drawBuilding(ctx, spec, size, w, h, stage, variant),
     (ctx) => drawUnder(ctx, spec, size, w, h),
     defId === 'wall' ? 1.1 : 1.6,
+  );
+}
+
+/**
+ * Worn ground under a building's footprint, drawn beneath it so the tiles it
+ * occupies read on the grass. Same geometry as procedural building textures.
+ */
+export function padTexture(scene: Phaser.Scene, size: number): string {
+  const key = `b:pad:${size}`;
+  if (scene.textures.exists(key)) return key;
+  const w = size * TW + 8,
+    h = size * TH + 8;
+  return makeTexture(
+    scene,
+    key,
+    w,
+    h,
+    () => {},
+    (ctx) => footprint(ctx, new Iso(ctx, w / 2, h - 2 - (size * TH) / 2), size * 0.47, 0x6f8f3a),
+    0,
   );
 }
 

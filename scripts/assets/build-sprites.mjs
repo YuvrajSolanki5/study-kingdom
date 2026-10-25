@@ -1,7 +1,7 @@
 // Builds game sprites from the Supercell fan kit (used with permission; see
 // docs/licensing.md). Reads the raw kit downloaded by fetch-fankit.py, trims and
-// scales each chosen image, and writes WebP files into apps/client/public/sprites
-// and their index into apps/client/src/game/sprite-index.json. Anything without a sprite keeps procedural art.
+// scales each chosen image, and writes WebP files and their index into
+// assets/sprite-source. stylize-sprites.mjs turns those into the game's own look.
 //
 //   SK_ASSET_SOURCE=/Volumes/SolankiNAS/Assets/supercell-coc-fankit node scripts/assets/build-sprites.mjs
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -11,8 +11,8 @@ import sharp from 'sharp';
 const SRC = process.env.SK_ASSET_SOURCE ?? process.argv[2];
 if (!SRC) throw new Error('Set SK_ASSET_SOURCE to the fan kit folder');
 const ROOT = join(import.meta.dirname, '../..');
-const OUT = join(ROOT, 'apps/client/public/sprites');
-const INDEX = join(ROOT, 'apps/client/src/game/sprite-index.json');
+const OUT = join(ROOT, 'assets/sprite-source/sprites');
+const INDEX = join(ROOT, 'assets/sprite-source/index.json');
 const manifest = JSON.parse(readFileSync(join(SRC, 'manifest.json'), 'utf8'));
 const TW = 64;
 /** Sprites are stored at twice their on-screen size so zoomed-in views stay crisp. */

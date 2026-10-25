@@ -18,7 +18,8 @@ export function PhaserHost() {
     const game = new Phaser.Game({
       type: Phaser.AUTO,
       parent: ref.current,
-      backgroundColor: '#3d6b35',
+      // The forest floor around the map (groundTexture), so zooming out shows no edge.
+      backgroundColor: '#3f7a2a',
       antialias: true,
       banner: false,
       disableContextMenu: true,

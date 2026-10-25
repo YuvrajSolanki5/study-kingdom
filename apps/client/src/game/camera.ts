@@ -14,10 +14,12 @@ const TAP_SLOP = 8;
 /**
  * Pan by dragging empty space, zoom with the wheel or trackpad pinch. A press
  * becomes a pan once it moves beyond TAP_SLOP unless a handler claimed it.
+ * `worldW` caps zooming out at the width of the map, so its edge stays off screen.
  */
 export function attachControls(
   scene: Phaser.Scene,
   handlers: PointerHandlers,
+  worldW?: number,
   limits = { min: 0.35, max: 2.2 },
 ) {
   const cam = scene.cameras.main;
@@ -63,7 +65,8 @@ export function attachControls(
     const before = cam.getWorldPoint(p.x, p.y);
     // Trackpad pinch arrives as ctrl+wheel with small deltas.
     const factor = Math.exp(-dy * (p.event instanceof WheelEvent && p.event.ctrlKey ? 0.01 : 0.0015));
-    cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, limits.min, limits.max));
+    const min = Math.max(limits.min, worldW ? cam.width / worldW : 0);
+    cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, Math.min(min, cam.zoom), limits.max));
     const after = cam.getWorldPoint(p.x, p.y);
     cam.scrollX += before.x - after.x;
     cam.scrollY += before.y - after.y;

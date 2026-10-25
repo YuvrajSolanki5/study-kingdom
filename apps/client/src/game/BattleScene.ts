@@ -26,6 +26,7 @@ import {
   facesLeft,
   fitSprite,
   groundTexture,
+  padTexture,
   isFanArt,
   preloadBuildings,
   preloadScenery,
@@ -107,6 +108,14 @@ export class BattleScene extends Phaser.Scene {
     this.zone = this.add.graphics().setDepth(-5).setAlpha(0);
     this.drawNoDeployZone();
     for (const info of this.rt.infos) {
+      if (info.size > 1)
+        fitSprite(
+          this.add.image(
+            isoX(info.x + info.size, info.y + info.size),
+            isoY(info.x + info.size, info.y + info.size),
+            padTexture(this, info.size),
+          ),
+        ).setDepth(-6);
       const key = buildingTexture(this, this.content, info.defId, info.level);
       const img = this.add.image(
         isoX(info.x + info.size, info.y + info.size),
@@ -138,25 +147,29 @@ export class BattleScene extends Phaser.Scene {
     };
     battleBridge.restartReplay = () => this.scene.restart(this.cfg);
     if (!this.cfg.replay) {
-      attachControls(this, {
-        down: () => {
-          const sel = useBattleHud.getState().selection;
-          if (sel) this.zone.setAlpha(0.35);
-          return false;
+      attachControls(
+        this,
+        {
+          down: () => {
+            const sel = useBattleHud.getState().selection;
+            if (sel) this.zone.setAlpha(0.35);
+            return false;
+          },
+          up: (p, tap) => {
+            this.zone.setAlpha(0);
+            if (tap) this.deployAt(p);
+          },
+          hold: (p, held) => {
+            if (held < 350 || performance.now() - this.lastHoldDeploy < 140) return;
+            const sel = useBattleHud.getState().selection;
+            if (sel?.k !== 'troop') return;
+            this.lastHoldDeploy = performance.now();
+            this.deployAt(p);
+          },
         },
-        up: (p, tap) => {
-          this.zone.setAlpha(0);
-          if (tap) this.deployAt(p);
-        },
-        hold: (p, held) => {
-          if (held < 350 || performance.now() - this.lastHoldDeploy < 140) return;
-          const sel = useBattleHud.getState().selection;
-          if (sel?.k !== 'troop') return;
-          this.lastHoldDeploy = performance.now();
-          this.deployAt(p);
-        },
-      });
-    } else attachControls(this, {});
+        size * TW,
+      );
+    } else attachControls(this, {}, size * TW);
     exposeScene(this, 'battle');
   }
 

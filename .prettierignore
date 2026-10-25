@@ -12,3 +12,4 @@ release-out
 test-results
 apps/desktop/src-tauri/target
 apps/client/src/game/sprite-index.json
+assets/sprite-source/index.json

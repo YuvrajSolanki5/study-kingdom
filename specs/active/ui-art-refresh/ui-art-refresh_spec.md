@@ -40,6 +40,18 @@ Make Study Kingdom look like a polished village-strategy game rather than a flat
 
 Done: village first-draw fix, non-overlapping onboarding dock, Clash font and game-style UI, per-level building sprites (110), unit sprites (15), portraits and icons, fan kit scenery, renamed content. Lint, typecheck, unit, integration and the full e2e suite pass; screenshots checked at 1440/1280/960 px in Chromium and WebKit.
 
+## Iteration 2: restyle and fit (26 October 2026)
+
+Owner feedback: the kit art looked pasted in and did not fit; the build area felt cramped, with buildings too big for it. The NAS is no longer reachable, so the work starts from the committed sprites.
+
+- Committed sprites moved to `assets/sprite-source/` (source, not served). The new `stylize-sprites.mjs` (`npm run assets:stylize`) produces the shipped sprites. It paints over the renders, applies a cel-shaded warm grade, recolours with our own schemes (slate-blue Keep roofs, green barracks, teal arcane glow, new troop hair, robes and skins, new spell vial colours) and adds the procedural art's ink outline.
+- Buildings are scaled to 82–92% of their old size. Each building over one tile gets a worn-ground footprint pad (village and battle), so footprints read on the grass.
+- Walls and traps use the procedural art: it joins into runs, and the kit's bombs and balloons looked like props. Shop thumbnails without a sprite render the procedural art.
+- The village opens framing the whole build area (it used to open on the middle half). Zooming out stops at the map's width, and the canvas background matches the forest floor.
+- Map size is unchanged (44 tiles, 40 buildable). At HQ10 the full roster covers only about 600 of 1,600 buildable tiles, so the cramped feel came from oversized art and a close camera, not a lack of tiles.
+
+Verified: lint, format, typecheck, unit (79), integration (45) and the full e2e suite (Chromium and WebKit) pass. Screenshots were checked at 1440×900 in both engines (village, zoomed in and out, shop, battle).
+
 ## Success Criteria
 
 - Screenshots at 1440×900, 1280×820 and 960×640 in Chromium and WebKit show the starter village on load, no overlapping controls, and every building and unit with distinct art.

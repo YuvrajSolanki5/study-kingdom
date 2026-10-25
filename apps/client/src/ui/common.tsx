@@ -1,11 +1,12 @@
-import type { Cost } from '@sk/content';
+import { getContent, type Cost } from '@sk/content';
 import { useEffect, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { buildingThumbnail } from '../game/art/buildings.ts';
 import sprites from '../game/sprite-index.json';
 import { serverNow, useGame } from '../state/store.ts';
 import { fmtDuration, fmtNumber } from './format.ts';
 
-// Interface art from the Supercell fan kit (docs/licensing.md), built by
-// scripts/assets/build-sprites.mjs. Callers pass a fallback for missing art.
+// Interface art restyled from the Supercell fan kit (docs/licensing.md), built
+// by scripts/assets/stylize-sprites.mjs. Callers pass a fallback for missing art.
 const ART = `${import.meta.env.BASE_URL}sprites/`;
 const INDEX = sprites as {
   ui: Record<string, string>;
@@ -17,11 +18,13 @@ export function artUrl(name: string): string | null {
   return f ? ART + f : null;
 }
 
-/** Thumbnail of a building at a level (its in-game sprite). */
+/** Thumbnail of a building at a level: its in-game sprite, or its procedural art. */
 export function buildingArtUrl(defId: string, level = 1): string | null {
   const list = INDEX.buildings[defId];
   const e = list?.[Math.min(level, list.length) - 1];
-  return e ? ART + e.file : null;
+  if (e) return ART + e.file;
+  const def = getContent().structures[defId];
+  return def ? buildingThumbnail(defId, def.size) : null;
 }
 
 export function Icon({

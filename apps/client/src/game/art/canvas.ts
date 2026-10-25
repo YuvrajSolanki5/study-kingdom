@@ -545,6 +545,18 @@ export function makeTexture(
   under?: (ctx: Ctx) => void,
   outline = 1.6,
 ): string {
+  scene.textures.addCanvas(key, paint(w, h, draw, under, outline));
+  return key;
+}
+
+/** Draws art with its ink outline and optional underlay (shadows) onto a new canvas. */
+export function paint(
+  w: number,
+  h: number,
+  draw: (ctx: Ctx) => void,
+  under?: (ctx: Ctx) => void,
+  outline = 1.6,
+): HTMLCanvasElement {
   const art = document.createElement('canvas');
   art.width = w;
   art.height = h;
@@ -575,8 +587,7 @@ export function makeTexture(
     under(ctx);
     ctx.globalCompositeOperation = 'source-over';
   }
-  scene.textures.addCanvas(key, out);
-  return key;
+  return out;
 }
 
 /** Soft elliptical shadow (no ctx.filter, which WebKit lacks). */

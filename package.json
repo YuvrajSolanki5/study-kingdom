@@ -37,7 +37,8 @@
     "balance:combat": "node --experimental-strip-types scripts/balance-combat.ts",
     "test:backup": "node --experimental-strip-types scripts/db/test-backup.mjs",
     "assets:fetch": "python3 -I scripts/assets/fetch-fankit.py",
-    "assets:sprites": "node scripts/assets/build-sprites.mjs"
+    "assets:sprites": "node scripts/assets/build-sprites.mjs",
+    "assets:stylize": "node scripts/assets/stylize-sprites.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

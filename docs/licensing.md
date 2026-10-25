@@ -21,13 +21,19 @@ python3 -I scripts/assets/fetch-fankit.py /Volumes/SolankiNAS/Assets/supercell-c
 
 The script is resumable and writes `manifest.json` (id, title, categories, size, source URL) beside the files. The Logo (337) and Audio (652) libraries download the same way with `fetch-fankit.py DEST 337 Logo` / `652 Audio`; the Clash font is under `Font/`.
 
-Only processed sprites derived from the kit are committed. Rebuild them after changing a mapping or when more of the kit has downloaded:
+Only processed sprites derived from the kit are committed, in two steps. `scripts/assets/build-sprites.mjs` maps each of our structures and levels to a fan kit building and level, picks one 3D render per unit, crops portraits and interface icons, and writes WebP files with their index to `assets/sprite-source/`. It needs the NAS:
 
 ```bash
 SK_ASSET_SOURCE=/Volumes/SolankiNAS/Assets/supercell-coc-fankit npm run assets:sprites
 ```
 
-`scripts/assets/build-sprites.mjs` maps each of our structures and levels to a fan kit building and level, picks one 3D render per unit, crops portraits and interface icons, and writes WebP files to `apps/client/public/sprites/` with their index in `apps/client/src/game/sprite-index.json`. Structure, unit and spell names stay our own. Anything without a sprite falls back to the original procedural art in `apps/client/src/game/art/`.
+`scripts/assets/stylize-sprites.mjs` then turns that committed source into the game's own look, so nothing ships as an exact copy of the kit. It paints over the renders (a Kuwahara filter), applies a soft cel-shaded warm grade, recolours roofs, robes and trims into our own schemes, and adds the same ink outline as the procedural art. It also scales buildings to fit inside their footprint. It writes `apps/client/public/sprites/` and `apps/client/src/game/sprite-index.json`, and runs without the NAS:
+
+```bash
+npm run assets:stylize
+```
+
+Walls and traps always use the procedural art: the kit's walls cannot join into runs. Structure, unit and spell names stay our own. Anything without a sprite falls back to the original procedural art in `apps/client/src/game/art/`.
 
 ## Original work
 

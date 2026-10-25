@@ -4,983 +4,743 @@
   "headquarters": [
    {
     "file": "b/headquarters-1.webp",
-    "w": 502,
-    "h": 438,
-    "dy": 0,
-    "src": "Building_HV_Town_Hall_level_1"
+    "w": 430,
+    "h": 376,
+    "dy": 0.010638297872340425
    },
    {
     "file": "b/headquarters-2.webp",
-    "w": 502,
-    "h": 460,
-    "dy": 0,
-    "src": "Building_HV_Town_Hall_level_2"
+    "w": 430,
+    "h": 395,
+    "dy": 0.010126582278481013
    },
    {
     "file": "b/headquarters-3.webp",
-    "w": 502,
-    "h": 497,
-    "dy": 0,
-    "src": "Building_HV_Town_Hall_level_3"
+    "w": 430,
+    "h": 426,
+    "dy": 0.009389671361502348
    },
    {
     "file": "b/headquarters-4.webp",
-    "w": 502,
-    "h": 540,
-    "dy": 0,
-    "src": "Building_HV_Town_Hall_level_4"
+    "w": 430,
+    "h": 462,
+    "dy": 0.008658008658008658
    },
    {
     "file": "b/headquarters-5.webp",
-    "w": 502,
-    "h": 539,
-    "dy": 0,
-    "src": "Building_HV_Town_Hall_level_5"
+    "w": 430,
+    "h": 461,
+    "dy": 0.008676789587852495
    },
    {
     "file": "b/headquarters-6.webp",
-    "w": 502,
-    "h": 546,
-    "dy": 0,
-    "src": "Building_HV_Town_Hall_level_6"
+    "w": 430,
+    "h": 467,
+    "dy": 0.008565310492505354
    },
    {
     "file": "b/headquarters-7.webp",
-    "w": 502,
-    "h": 558,
-    "dy": 0,
-    "src": "Building_HV_Town_Hall_level_7"
+    "w": 430,
+    "h": 477,
+    "dy": 0.008385744234800839
    },
    {
     "file": "b/headquarters-8.webp",
-    "w": 502,
-    "h": 584,
-    "dy": 0,
-    "src": "Building_HV_Town_Hall_level_8"
+    "w": 430,
+    "h": 499,
+    "dy": 0.008016032064128256
    },
    {
     "file": "b/headquarters-9.webp",
-    "w": 502,
-    "h": 562,
-    "dy": 0,
-    "src": "Building_HV_Town_Hall_level_9"
+    "w": 430,
+    "h": 480,
+    "dy": 0.008333333333333333
    },
    {
     "file": "b/headquarters-10.webp",
-    "w": 502,
-    "h": 512,
-    "dy": 0,
-    "src": "Building_HV_Town_Hall_level_10"
+    "w": 430,
+    "h": 438,
+    "dy": 0.0091324200913242
    }
   ],
   "treasury": [
    {
     "file": "b/treasury-1.webp",
-    "w": 330,
-    "h": 278,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_1"
+    "w": 292,
+    "h": 247,
+    "dy": 0.016194331983805668
    },
    {
     "file": "b/treasury-2.webp",
-    "w": 330,
-    "h": 302,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_2"
+    "w": 292,
+    "h": 268,
+    "dy": 0.014925373134328358
    },
    {
     "file": "b/treasury-3.webp",
-    "w": 330,
-    "h": 321,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_3"
+    "w": 292,
+    "h": 284,
+    "dy": 0.014084507042253521
    },
    {
     "file": "b/treasury-4.webp",
-    "w": 330,
-    "h": 330,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_4"
+    "w": 292,
+    "h": 292,
+    "dy": 0.0136986301369863
    },
    {
     "file": "b/treasury-5.webp",
-    "w": 330,
-    "h": 346,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_5"
+    "w": 292,
+    "h": 306,
+    "dy": 0.013071895424836602
    },
    {
     "file": "b/treasury-6.webp",
-    "w": 330,
-    "h": 361,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_6"
+    "w": 292,
+    "h": 319,
+    "dy": 0.012539184952978056
    },
    {
     "file": "b/treasury-7.webp",
-    "w": 330,
-    "h": 322,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_7"
+    "w": 292,
+    "h": 285,
+    "dy": 0.014035087719298246
    },
    {
     "file": "b/treasury-8.webp",
-    "w": 330,
-    "h": 306,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_8_1"
+    "w": 292,
+    "h": 271,
+    "dy": 0.014760147601476014
    },
    {
     "file": "b/treasury-9.webp",
-    "w": 330,
-    "h": 322,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_9"
+    "w": 292,
+    "h": 285,
+    "dy": 0.014035087719298246
    },
    {
     "file": "b/treasury-10.webp",
-    "w": 330,
-    "h": 326,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_10"
+    "w": 292,
+    "h": 289,
+    "dy": 0.01384083044982699
    },
    {
     "file": "b/treasury-11.webp",
-    "w": 330,
-    "h": 334,
-    "dy": 0,
-    "src": "Building_HV_Gold_Storage_level_11"
+    "w": 292,
+    "h": 295,
+    "dy": 0.013559322033898305
    }
   ],
   "barracks": [
    {
     "file": "b/barracks-1.webp",
-    "w": 346,
-    "h": 387,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_1"
+    "w": 299,
+    "h": 333,
+    "dy": 0.012012012012012012
    },
    {
     "file": "b/barracks-2.webp",
-    "w": 346,
-    "h": 322,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_2"
+    "w": 299,
+    "h": 279,
+    "dy": 0.014336917562724014
    },
    {
     "file": "b/barracks-3.webp",
-    "w": 346,
-    "h": 316,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_3"
+    "w": 299,
+    "h": 274,
+    "dy": 0.014598540145985401
    },
    {
     "file": "b/barracks-4.webp",
-    "w": 346,
-    "h": 316,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_4"
+    "w": 299,
+    "h": 274,
+    "dy": 0.014598540145985401
    },
    {
     "file": "b/barracks-5.webp",
-    "w": 346,
-    "h": 352,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_5"
+    "w": 299,
+    "h": 304,
+    "dy": 0.013157894736842105
    },
    {
     "file": "b/barracks-6.webp",
-    "w": 346,
-    "h": 329,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_6"
+    "w": 299,
+    "h": 285,
+    "dy": 0.014035087719298246
    },
    {
     "file": "b/barracks-7.webp",
-    "w": 346,
-    "h": 347,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_7"
+    "w": 299,
+    "h": 300,
+    "dy": 0.013333333333333334
    },
    {
     "file": "b/barracks-8.webp",
-    "w": 346,
-    "h": 364,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_8"
+    "w": 299,
+    "h": 314,
+    "dy": 0.012738853503184714
    },
    {
     "file": "b/barracks-9.webp",
-    "w": 346,
-    "h": 351,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_9"
+    "w": 299,
+    "h": 303,
+    "dy": 0.013201320132013201
    },
    {
     "file": "b/barracks-10.webp",
-    "w": 346,
-    "h": 381,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_10"
+    "w": 299,
+    "h": 328,
+    "dy": 0.012195121951219513
    },
    {
     "file": "b/barracks-11.webp",
-    "w": 346,
-    "h": 339,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_11"
+    "w": 299,
+    "h": 293,
+    "dy": 0.013651877133105802
    },
    {
     "file": "b/barracks-12.webp",
-    "w": 346,
-    "h": 308,
-    "dy": 0,
-    "src": "Building_HV_Barracks_level_12"
+    "w": 299,
+    "h": 267,
+    "dy": 0.0149812734082397
    }
   ],
   "army_camp": [
    {
     "file": "b/army_camp-1.webp",
-    "w": 256,
-    "h": 174,
-    "dy": 0,
-    "src": "Building_HV_Army_Camp_level_01"
+    "w": 238,
+    "h": 164,
+    "dy": 0.024390243902439025
    },
    {
     "file": "b/army_camp-2.webp",
-    "w": 420,
-    "h": 366,
-    "dy": 0,
-    "src": "Building_HV_Army_Camp_level_02"
+    "w": 386,
+    "h": 337,
+    "dy": 0.011869436201780416
    },
    {
     "file": "b/army_camp-3.webp",
-    "w": 420,
-    "h": 388,
-    "dy": 0,
-    "src": "Building_HV_Army_Camp_level_03"
+    "w": 386,
+    "h": 357,
+    "dy": 0.011204481792717087
    },
    {
     "file": "b/army_camp-4.webp",
-    "w": 440,
-    "h": 407,
-    "dy": 0,
-    "src": "Building_HV_Army_Camp_level_04"
+    "w": 404,
+    "h": 374,
+    "dy": 0.0106951871657754
    },
    {
     "file": "b/army_camp-5.webp",
-    "w": 440,
-    "h": 390,
-    "dy": 0,
-    "src": "Building_HV_Army_Camp_level_05"
+    "w": 404,
+    "h": 359,
+    "dy": 0.011142061281337047
    },
    {
     "file": "b/army_camp-6.webp",
-    "w": 440,
-    "h": 390,
-    "dy": 0,
-    "src": "Building_HV_Army_Camp_level_05"
+    "w": 404,
+    "h": 359,
+    "dy": 0.011142061281337047
    },
    {
     "file": "b/army_camp-7.webp",
-    "w": 461,
-    "h": 467,
-    "dy": 0,
-    "src": "Building_HV_Army_Camp_level_07"
+    "w": 423,
+    "h": 428,
+    "dy": 0.009345794392523364
    },
    {
     "file": "b/army_camp-8.webp",
-    "w": 461,
-    "h": 467,
-    "dy": 0,
-    "src": "Building_HV_Army_Camp_level_07"
+    "w": 423,
+    "h": 428,
+    "dy": 0.009345794392523364
    }
   ],
   "research_library": [
    {
     "file": "b/research_library-1.webp",
-    "w": 330,
-    "h": 322,
-    "dy": 0,
-    "src": "Building_HV_Laboratory_level_1"
+    "w": 292,
+    "h": 285,
+    "dy": 0.014035087719298246
    },
    {
     "file": "b/research_library-2.webp",
-    "w": 330,
-    "h": 300,
-    "dy": 0,
-    "src": "Building_HV_Laboratory_level_2"
+    "w": 292,
+    "h": 266,
+    "dy": 0.015037593984962405
    },
    {
     "file": "b/research_library-3.webp",
-    "w": 330,
-    "h": 298,
-    "dy": 0,
-    "src": "Building_HV_Laboratory_level_3"
+    "w": 292,
+    "h": 264,
+    "dy": 0.015151515151515152
    },
    {
     "file": "b/research_library-4.webp",
-    "w": 330,
-    "h": 298,
-    "dy": 0,
-    "src": "Building_HV_Laboratory_level_4"
+    "w": 292,
+    "h": 264,
+    "dy": 0.015151515151515152
    },
    {
     "file": "b/research_library-5.webp",
-    "w": 330,
-    "h": 291,
-    "dy": 0,
-    "src": "Building_HV_Laboratory_level_5"
+    "w": 292,
+    "h": 258,
+    "dy": 0.015503875968992248
    },
    {
     "file": "b/research_library-6.webp",
-    "w": 330,
-    "h": 371,
-    "dy": 0,
-    "src": "Building_HV_Laboratory_level_6"
+    "w": 292,
+    "h": 327,
+    "dy": 0.012232415902140673
    },
    {
     "file": "b/research_library-7.webp",
-    "w": 330,
-    "h": 275,
-    "dy": 0,
-    "src": "Building_HV_Laboratory_level_7"
+    "w": 292,
+    "h": 245,
+    "dy": 0.0163265306122449
    },
    {
     "file": "b/research_library-8.webp",
-    "w": 330,
-    "h": 283,
-    "dy": 0,
-    "src": "Building_HV_Laboratory_level_8"
+    "w": 292,
+    "h": 252,
+    "dy": 0.015873015873015872
    },
    {
     "file": "b/research_library-9.webp",
-    "w": 330,
-    "h": 276,
-    "dy": 0,
-    "src": "Building_HV_Laboratory_level_9"
+    "w": 292,
+    "h": 246,
+    "dy": 0.016260162601626018
    }
   ],
   "clan_hall": [
    {
     "file": "b/clan_hall-1.webp",
-    "w": 338,
-    "h": 262,
-    "dy": 0,
-    "src": "Building_HV_Clan_Castle_level_1"
+    "w": 299,
+    "h": 234,
+    "dy": 0.017094017094017096
    },
    {
     "file": "b/clan_hall-2.webp",
-    "w": 338,
-    "h": 346,
-    "dy": 0,
-    "src": "Building_HV_Clan_Castle_level_3"
+    "w": 299,
+    "h": 306,
+    "dy": 0.013071895424836602
    },
    {
     "file": "b/clan_hall-3.webp",
-    "w": 338,
-    "h": 334,
-    "dy": 0,
-    "src": "Building_HV_Clan_Castle_level_5"
+    "w": 299,
+    "h": 296,
+    "dy": 0.013513513513513514
    },
    {
     "file": "b/clan_hall-4.webp",
-    "w": 338,
-    "h": 338,
-    "dy": 0,
-    "src": "Building_HV_Clan_Castle_level_6"
+    "w": 299,
+    "h": 299,
+    "dy": 0.013377926421404682
    },
    {
     "file": "b/clan_hall-5.webp",
-    "w": 338,
-    "h": 344,
-    "dy": 0,
-    "src": "Building_HV_Clan_Castle_level_7"
+    "w": 299,
+    "h": 304,
+    "dy": 0.013157894736842105
    }
   ],
   "workshop": [
    {
     "file": "b/workshop-1.webp",
-    "w": 346,
-    "h": 382,
-    "dy": 0,
-    "src": "Building_HV_Workshop_level_1"
+    "w": 299,
+    "h": 329,
+    "dy": 0.0121580547112462
    },
    {
     "file": "b/workshop-2.webp",
-    "w": 346,
-    "h": 475,
-    "dy": 0,
-    "src": "Building_HV_Workshop_level_4"
+    "w": 299,
+    "h": 407,
+    "dy": 0.009828009828009828
    },
    {
     "file": "b/workshop-3.webp",
-    "w": 346,
-    "h": 461,
-    "dy": 0,
-    "src": "Building_HV_Workshop_level_5"
+    "w": 299,
+    "h": 396,
+    "dy": 0.010101010101010102
    }
   ],
   "builder_lodge": [
    {
     "file": "b/builder_lodge-1.webp",
-    "w": 230,
-    "h": 286,
-    "dy": 0,
-    "src": "Building_HV_Builder_Hut_Level_1"
+    "w": 201,
+    "h": 248,
+    "dy": 0.016129032258064516
    }
   ],
   "bolt_thrower": [
    {
     "file": "b/bolt_thrower-1.webp",
-    "w": 238,
-    "h": 272,
-    "dy": 0,
-    "src": "Building_HV_Cannon_level_1"
+    "w": 227,
+    "h": 258,
+    "dy": 0.015503875968992248
    },
    {
     "file": "b/bolt_thrower-2.webp",
-    "w": 238,
-    "h": 226,
-    "dy": 0,
-    "src": "Building_HV_Cannon_level_3"
+    "w": 227,
+    "h": 216,
+    "dy": 0.018518518518518517
    },
    {
     "file": "b/bolt_thrower-3.webp",
-    "w": 238,
-    "h": 189,
-    "dy": 0,
-    "src": "Building_HV_Cannon_level_7"
+    "w": 227,
+    "h": 182,
+    "dy": 0.02197802197802198
    },
    {
     "file": "b/bolt_thrower-4.webp",
-    "w": 238,
-    "h": 203,
-    "dy": 0,
-    "src": "Building_HV_Cannon_level_10"
+    "w": 227,
+    "h": 195,
+    "dy": 0.020512820512820513
    },
    {
     "file": "b/bolt_thrower-5.webp",
-    "w": 238,
-    "h": 229,
-    "dy": 0,
-    "src": "Building_HV_Cannon_level_13"
+    "w": 227,
+    "h": 219,
+    "dy": 0.0182648401826484
    }
   ],
   "watchtower": [
    {
     "file": "b/watchtower-1.webp",
-    "w": 253,
-    "h": 363,
-    "dy": 0,
-    "src": "Building_HV_Archer_Tower_level_1"
+    "w": 236,
+    "h": 335,
+    "dy": 0.011940298507462687
    },
    {
     "file": "b/watchtower-2.webp",
-    "w": 253,
-    "h": 368,
-    "dy": 0,
-    "src": "Building_HV_Archer_Tower_level_4"
+    "w": 236,
+    "h": 340,
+    "dy": 0.011764705882352941
    },
    {
     "file": "b/watchtower-3.webp",
-    "w": 253,
-    "h": 359,
-    "dy": 0,
-    "src": "Building_HV_Archer_Tower_level_7"
+    "w": 236,
+    "h": 332,
+    "dy": 0.012048192771084338
    },
    {
     "file": "b/watchtower-4.webp",
-    "w": 253,
-    "h": 327,
-    "dy": 0,
-    "src": "Building_HV_Archer_Tower_level_10"
+    "w": 236,
+    "h": 303,
+    "dy": 0.013201320132013201
    },
    {
     "file": "b/watchtower-5.webp",
-    "w": 253,
-    "h": 332,
-    "dy": 0,
-    "src": "Building_HV_Archer_Tower_level_13"
+    "w": 236,
+    "h": 307,
+    "dy": 0.013029315960912053
    }
   ],
   "catapult": [
    {
     "file": "b/catapult-1.webp",
-    "w": 253,
-    "h": 278,
-    "dy": 0,
-    "src": "Building_HV_Mortar_level_1"
+    "w": 236,
+    "h": 259,
+    "dy": 0.015444015444015444
    },
    {
     "file": "b/catapult-2.webp",
-    "w": 253,
-    "h": 248,
-    "dy": 0,
-    "src": "Building_HV_Mortar_level_3"
+    "w": 236,
+    "h": 231,
+    "dy": 0.017316017316017316
    },
    {
     "file": "b/catapult-3.webp",
-    "w": 253,
-    "h": 254,
-    "dy": 0,
-    "src": "Building_HV_Mortar_level_6"
+    "w": 236,
+    "h": 237,
+    "dy": 0.016877637130801686
    },
    {
     "file": "b/catapult-4.webp",
-    "w": 253,
-    "h": 258,
-    "dy": 0,
-    "src": "Building_HV_Mortar_level_9"
+    "w": 236,
+    "h": 241,
+    "dy": 0.016597510373443983
    }
   ],
   "skyspear": [
    {
     "file": "b/skyspear-1.webp",
-    "w": 300,
-    "h": 400,
-    "dy": 0,
-    "src": "Building_HV_Air_Defense_level_1"
+    "w": 266,
+    "h": 352,
+    "dy": 0.011363636363636364
    },
    {
     "file": "b/skyspear-2.webp",
-    "w": 300,
-    "h": 393,
-    "dy": 0,
-    "src": "Building_HV_Air_Defense_level_3_1"
+    "w": 266,
+    "h": 346,
+    "dy": 0.011560693641618497
    },
    {
     "file": "b/skyspear-3.webp",
-    "w": 300,
-    "h": 370,
-    "dy": 0,
-    "src": "Building_HV_Air_Defense_level_6"
+    "w": 266,
+    "h": 326,
+    "dy": 0.012269938650306749
    },
    {
     "file": "b/skyspear-4.webp",
-    "w": 300,
-    "h": 439,
-    "dy": 0,
-    "src": "Building_HV_Air_Defense_level_9"
+    "w": 266,
+    "h": 386,
+    "dy": 0.010362694300518135
    }
   ],
   "arcane_spire": [
    {
     "file": "b/arcane_spire-1.webp",
-    "w": 253,
-    "h": 289,
-    "dy": 0,
-    "src": "Building_HV_Wizard_Tower_level_1"
+    "w": 236,
+    "h": 268,
+    "dy": 0.014925373134328358
    },
    {
     "file": "b/arcane_spire-2.webp",
-    "w": 253,
-    "h": 286,
-    "dy": 0,
-    "src": "Building_HV_Wizard_Tower_level_3"
+    "w": 236,
+    "h": 266,
+    "dy": 0.015037593984962405
    },
    {
     "file": "b/arcane_spire-3.webp",
-    "w": 253,
-    "h": 280,
-    "dy": 0,
-    "src": "Building_HV_Wizard_Tower_level_6"
+    "w": 236,
+    "h": 260,
+    "dy": 0.015384615384615385
    },
    {
     "file": "b/arcane_spire-4.webp",
-    "w": 253,
-    "h": 311,
-    "dy": 0,
-    "src": "Building_HV_Wizard_Tower_level_9"
+    "w": 236,
+    "h": 288,
+    "dy": 0.013888888888888888
    }
   ],
   "storm_totem": [
    {
     "file": "b/storm_totem-1.webp",
-    "w": 184,
-    "h": 303,
-    "dy": 0,
-    "src": "Building_HV_Hidden_Tesla_level_1"
+    "w": 170,
+    "h": 275,
+    "dy": 0.014545454545454545
    },
    {
     "file": "b/storm_totem-2.webp",
-    "w": 184,
-    "h": 304,
-    "dy": 0,
-    "src": "Building_HV_Hidden_Tesla_level_5"
+    "w": 170,
+    "h": 276,
+    "dy": 0.014492753623188406
    },
    {
     "file": "b/storm_totem-3.webp",
-    "w": 184,
-    "h": 337,
-    "dy": 0,
-    "src": "Building_HV_Hidden_Tesla_level_9"
+    "w": 170,
+    "h": 305,
+    "dy": 0.013114754098360656
    }
   ],
   "repeater": [
    {
     "file": "b/repeater-1.webp",
-    "w": 307,
-    "h": 325,
-    "dy": 0,
-    "src": "Building_HV_X-Bow_level_1"
+    "w": 272,
+    "h": 287,
+    "dy": 0.013937282229965157
    },
    {
     "file": "b/repeater-2.webp",
-    "w": 307,
-    "h": 319,
-    "dy": 0,
-    "src": "Building_HV_X-Bow_level_2"
+    "w": 272,
+    "h": 282,
+    "dy": 0.014184397163120567
    },
    {
     "file": "b/repeater-3.webp",
-    "w": 307,
-    "h": 282,
-    "dy": 0,
-    "src": "Building_HV_X-Bow_level_4"
+    "w": 272,
+    "h": 251,
+    "dy": 0.01593625498007968
    }
   ],
   "ember_tower": [
    {
     "file": "b/ember_tower-1.webp",
-    "w": 243,
-    "h": 433,
-    "dy": 0,
-    "src": "Building_HV_Inferno_Tower_level_01"
+    "w": 207,
+    "h": 363,
+    "dy": 0.011019283746556474
    },
    {
     "file": "b/ember_tower-2.webp",
-    "w": 243,
-    "h": 416,
-    "dy": 0,
-    "src": "Building_HV_Inferno_Tower_level_03"
+    "w": 207,
+    "h": 349,
+    "dy": 0.011461318051575931
    },
    {
     "file": "b/ember_tower-3.webp",
-    "w": 243,
-    "h": 342,
-    "dy": 0,
-    "src": "Building_HV_Inferno_Tower_level_05"
-   }
-  ],
-  "wall": [
-   {
-    "file": "b/wall-1.webp",
-    "w": 102,
-    "h": 136,
-    "dy": 0,
-    "src": "Building_HV_Wall_level_01_1"
-   },
-   {
-    "file": "b/wall-2.webp",
-    "w": 102,
-    "h": 115,
-    "dy": 0,
-    "src": "Building_HV_Wall_level_02_1"
-   },
-   {
-    "file": "b/wall-3.webp",
-    "w": 102,
-    "h": 117,
-    "dy": 0,
-    "src": "Building_HV_Wall_level_03_1"
-   },
-   {
-    "file": "b/wall-4.webp",
-    "w": 102,
-    "h": 112,
-    "dy": 0,
-    "src": "Building_HV_Wall_level_05"
-   },
-   {
-    "file": "b/wall-5.webp",
-    "w": 102,
-    "h": 167,
-    "dy": 0,
-    "src": "Building_HV_Wall_level_07_1"
-   },
-   {
-    "file": "b/wall-6.webp",
-    "w": 102,
-    "h": 130,
-    "dy": 0,
-    "src": "Building_HV_Wall_level_09_1"
-   },
-   {
-    "file": "b/wall-7.webp",
-    "w": 102,
-    "h": 122,
-    "dy": 0,
-    "src": "Building_HV_Wall_level_11_1"
-   },
-   {
-    "file": "b/wall-8.webp",
-    "w": 102,
-    "h": 102,
-    "dy": 0,
-    "src": "Building_HV_Wall_level_13_1"
-   }
-  ],
-  "blast_mine": [
-   {
-    "file": "b/blast_mine-1.webp",
-    "w": 70,
-    "h": 100,
-    "dy": 0,
-    "src": "Building_HV_Bomb_level_1&2"
-   },
-   {
-    "file": "b/blast_mine-2.webp",
-    "w": 70,
-    "h": 85,
-    "dy": 0,
-    "src": "Building_HV_Bomb_level_5&6"
-   },
-   {
-    "file": "b/blast_mine-3.webp",
-    "w": 70,
-    "h": 67,
-    "dy": 0,
-    "src": "Building_HV_Bomb_level_9&10"
-   }
-  ],
-  "spring_snare": [
-   {
-    "file": "b/spring_snare-1.webp",
-    "w": 96,
-    "h": 87,
-    "dy": 0,
-    "src": "Building_HV_Spring_Trap_level_1&2"
-   },
-   {
-    "file": "b/spring_snare-2.webp",
-    "w": 96,
-    "h": 90,
-    "dy": 0,
-    "src": "Building_HV_Spring_Trap_level_3&4"
-   },
-   {
-    "file": "b/spring_snare-3.webp",
-    "w": 96,
-    "h": 91,
-    "dy": 0,
-    "src": "Building_HV_Spring_Trap_level_5"
-   }
-  ],
-  "sky_mine": [
-   {
-    "file": "b/sky_mine-1.webp",
-    "w": 77,
-    "h": 118,
-    "dy": 0,
-    "src": "Building_HV_Air_Bomb_level_1&2"
-   },
-   {
-    "file": "b/sky_mine-2.webp",
-    "w": 77,
-    "h": 124,
-    "dy": 0,
-    "src": "Building_HV_Air_Bomb_level_3&4"
-   },
-   {
-    "file": "b/sky_mine-3.webp",
-    "w": 77,
-    "h": 118,
-    "dy": 0,
-    "src": "Building_HV_Air_Bomb_level_5&6"
-   }
-  ],
-  "seeker_mine": [
-   {
-    "file": "b/seeker_mine-1.webp",
-    "w": 77,
-    "h": 110,
-    "dy": 0,
-    "src": "Building_HV_Seeking_Air_Mine_level_1&2"
-   },
-   {
-    "file": "b/seeker_mine-2.webp",
-    "w": 77,
-    "h": 104,
-    "dy": 0,
-    "src": "Building_HV_Seeking_Air_Mine_level_3&4"
-   },
-   {
-    "file": "b/seeker_mine-3.webp",
-    "w": 77,
-    "h": 109,
-    "dy": 0,
-    "src": "Building_HV_Seeking_Air_Mine_level_5&6"
+    "w": 207,
+    "h": 288,
+    "dy": 0.013888888888888888
    }
   ]
  },
  "units": {
   "swordsman": {
    "file": "u/swordsman.webp",
-   "w": 74,
-   "h": 102,
+   "w": 82,
+   "h": 110,
    "left": true,
    "flying": false,
-   "src": "Troop_HV_Barbarian_1"
+   "pad": 4
   },
   "archer": {
    "file": "u/archer.webp",
-   "w": 70,
-   "h": 102,
+   "w": 78,
+   "h": 110,
    "left": false,
    "flying": false,
-   "src": "Troop_HV_Archer_3"
+   "pad": 4
   },
   "bulwark": {
    "file": "u/bulwark.webp",
-   "w": 139,
-   "h": 142,
+   "w": 147,
+   "h": 150,
    "left": false,
    "flying": false,
-   "src": "Troop_HV_Giant_15"
+   "pad": 4
   },
   "sapper": {
    "file": "u/sapper.webp",
-   "w": 66,
-   "h": 88,
+   "w": 74,
+   "h": 96,
    "left": false,
    "flying": false,
-   "src": "Troop_HV_Wall_Breaker_2"
+   "pad": 4
   },
   "looter": {
    "file": "u/looter.webp",
-   "w": 81,
-   "h": 92,
+   "w": 89,
+   "h": 100,
    "left": true,
    "flying": false,
-   "src": "Troop_HV_Goblin_2"
+   "pad": 4
   },
   "wyvern": {
    "file": "u/wyvern.webp",
-   "w": 102,
-   "h": 96,
+   "w": 110,
+   "h": 104,
    "left": false,
    "flying": true,
-   "src": "Troop_HV_Minion_1"
+   "pad": 4
   },
   "mage": {
    "file": "u/mage.webp",
-   "w": 51,
-   "h": 106,
+   "w": 59,
+   "h": 114,
    "left": false,
    "flying": false,
-   "src": "Troop_HV_Wizard_8"
+   "pad": 4
   },
   "skyship": {
    "file": "u/skyship.webp",
-   "w": 92,
-   "h": 148,
+   "w": 100,
+   "h": 156,
    "left": false,
    "flying": true,
-   "src": "Troop_HV_Balloon_1"
+   "pad": 4
   },
   "vaulter": {
    "file": "u/vaulter.webp",
-   "w": 79,
-   "h": 114,
+   "w": 87,
+   "h": 122,
    "left": false,
    "flying": false,
-   "src": "Troop_HV_Hog_Rider_08"
+   "pad": 4
   },
   "drake": {
    "file": "u/drake.webp",
-   "w": 154,
-   "h": 194,
+   "w": 162,
+   "h": 202,
    "left": false,
    "flying": true,
-   "src": "Troop_HV_Dragon_1"
+   "pad": 4
   },
   "mender": {
    "file": "u/mender.webp",
-   "w": 96,
-   "h": 120,
+   "w": 104,
+   "h": 128,
    "left": false,
    "flying": true,
-   "src": "Troop_HV_Healer_1"
+   "pad": 4
   },
   "necromancer": {
    "file": "u/necromancer.webp",
-   "w": 111,
-   "h": 114,
+   "w": 119,
+   "h": 122,
    "left": false,
    "flying": false,
-   "src": "Troop_HV_Witch_17"
+   "pad": 4
   },
   "warlord": {
    "file": "u/warlord.webp",
-   "w": 89,
-   "h": 106,
+   "w": 97,
+   "h": 114,
    "left": false,
    "flying": false,
-   "src": "Barbarian_King_4"
+   "pad": 4
   },
   "sage": {
    "file": "u/sage.webp",
-   "w": 70,
-   "h": 106,
+   "w": 78,
+   "h": 114,
    "left": false,
    "flying": false,
-   "src": "Grand_Warden_1"
+   "pad": 4
   },
   "battering_ram": {
    "file": "u/battering_ram.webp",
-   "w": 138,
-   "h": 120,
+   "w": 146,
+   "h": 128,
    "left": false,
    "flying": false,
-   "src": "Siege_Machine_HV_Wall_Wrecker_1"
+   "pad": 4
   }
  },
  "scenery": {
   "tree_large": {
    "file": "s/tree_large.webp",
-   "w": 96,
-   "h": 116
+   "w": 102,
+   "h": 122
   },
   "tree_medium": {
    "file": "s/tree_medium.webp",
-   "w": 91,
-   "h": 107
+   "w": 97,
+   "h": 113
   },
   "pine": {
    "file": "s/pine.webp",
-   "w": 66,
-   "h": 89
+   "w": 72,
+   "h": 95
   },
   "bush": {
    "file": "s/bush.webp",
-   "w": 67,
-   "h": 63
+   "w": 73,
+   "h": 69
   },
   "rock_large": {
    "file": "s/rock_large.webp",
-   "w": 95,
-   "h": 84
+   "w": 101,
+   "h": 90
   },
   "rock_1": {
    "file": "s/rock_1.webp",
-   "w": 36,
-   "h": 33
-  },
-  "rock_3": {
-   "file": "s/rock_3.webp",
    "w": 42,
    "h": 39
   },
+  "rock_3": {
+   "file": "s/rock_3.webp",
+   "w": 48,
+   "h": 45
+  },
   "mushroom": {
    "file": "s/mushroom.webp",
-   "w": 52,
-   "h": 47
+   "w": 58,
+   "h": 53
   },
   "trunk": {
    "file": "s/trunk.webp",
-   "w": 61,
-   "h": 48
+   "w": 67,
+   "h": 54
   }
  },
  "ui": {
@@ -1021,6 +781,5 @@
   "drake": "ui/drake.webp",
   "mender": "ui/mender.webp",
   "necromancer": "ui/necromancer.webp"
- },
- "missing": []
+ }
 }
