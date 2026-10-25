@@ -6,7 +6,7 @@ Use Node 22+, npm, Docker and Rust for the Mac shell.
 
 ```bash
 npm install
-npx supabase start
+npm run db:start   # builds the Edge bundle, then starts Supabase
 cp apps/server/.dev.vars.example apps/server/.dev.vars
 # Set SUPABASE_PUBLISHABLE_KEY from `npx supabase status`.
 npm run dev

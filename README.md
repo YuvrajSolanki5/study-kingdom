@@ -31,7 +31,7 @@ The deployed game includes friends, private challenges and replays, ranked raids
 
 ```bash
 npm install
-npx supabase start                       # needs Docker (Colima works)
+npm run db:start                         # needs Docker (Colima works)
 cp apps/server/.dev.vars.example apps/server/.dev.vars   # add the publishable key from `npx supabase status`
 npm run dev & npm run dev:client         # http://localhost:5173 — demo1 / study-kingdom-dev
 ```

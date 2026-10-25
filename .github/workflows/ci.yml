@@ -53,9 +53,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium webkit
+      # supabase start reads the generated (gitignored) Edge Function bundle.
+      - run: node scripts/build-edge.mjs
       - run: npx supabase start
       - run: node scripts/prepare-ci.mjs
-      - run: node scripts/build-edge.mjs
       - name: Start local verification function
         run: npx supabase functions serve verify-battle --env-file supabase/functions/.env --no-verify-jwt > /tmp/sk-edge.log 2>&1 &
       - run: node scripts/test-edge.mjs
