@@ -50,6 +50,16 @@ export class VillageScene extends Phaser.Scene {
   }
 
   create() {
+    // The scene object is reused when returning from a battle, but stopping it
+    // destroyed every image; forget them so sync() draws the village again.
+    this.sprites.clear();
+    this.pads.clear();
+    this.ghost = null;
+    this.ghostPos = null;
+    this.drag = null;
+    this.lastState = null;
+    this.lastSelected = null;
+    this.wallStroke = [];
     const view = useGame.getState().view;
     this.content = contentOf(view);
     const { size, buildMin, buildMax } = this.content.map;

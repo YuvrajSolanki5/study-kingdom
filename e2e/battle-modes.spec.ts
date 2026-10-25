@@ -8,7 +8,21 @@ async function inBattle(page: Page) {
   );
 }
 
+/** Images in the village scene: the ground plus one per building and footprint pad. */
+async function villageImages(page: Page) {
+  return page.evaluate(() => {
+    const sk = (
+      window as unknown as {
+        __sk?: { scene: string; owner: { children: { list: { type: string; active: boolean }[] } } };
+      }
+    ).__sk;
+    if (sk?.scene !== 'village') return -1;
+    return sk.owner.children.list.filter((o) => o.type === 'Image' && o.active).length;
+  });
+}
+
 async function attackFirstBase(page: Page) {
+  await expect.poll(() => villageImages(page)).toBeGreaterThan(5);
   await page
     .getByRole('navigation')
     .getByRole('button', { name: /Attack/ })
@@ -20,10 +34,15 @@ async function attackFirstBase(page: Page) {
 test('auto-battle deploys the army and the server verifies the result', async ({ page }) => {
   await enableHooks(page);
   await registerAccount(page, uniqueUsername('auto'), 'Auto Scholar');
+  await expect.poll(() => villageImages(page)).toBeGreaterThan(5);
+  const before = await villageImages(page);
   await attackFirstBase(page);
   await page.getByRole('button', { name: /Auto-battle/ }).click();
   await expect(page.getByRole('heading', { name: 'Victory!' })).toBeVisible({ timeout: 60_000 });
   await expect(page.getByText(/Rewards:/)).toBeVisible();
+  // Regression: the village is redrawn after a battle, not just its ground.
+  await page.getByRole('button', { name: 'Return home' }).click();
+  await expect.poll(() => villageImages(page)).toBe(before);
 });
 
 test('live battles can speed up and skip to the end', async ({ page }) => {
