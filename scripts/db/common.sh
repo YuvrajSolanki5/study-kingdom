@@ -11,3 +11,12 @@ pg_tool() {
     fi
   )
 }
+
+# Client tools that need no connection, such as pg_restore -f -.
+pg_offline() {
+  if [[ -n "${PGTOOLS_CONTAINER:-}" ]]; then
+    docker exec -i "$PGTOOLS_CONTAINER" "$@"
+  else
+    "$@"
+  fi
+}

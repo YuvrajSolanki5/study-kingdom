@@ -15,7 +15,7 @@ Notifications are delivered between study sessions. Rooms show presence for two 
 
 ## Encrypted backups
 
-Prerequisites: Node 22+, PostgreSQL 17 client tools (`pg_dump`, `pg_restore`, `psql`) and a read-only backup/admin direct or **session-pooler** connection. Transaction pooling is unsuitable for these operations. `PGTOOLS_CONTAINER` optionally names an existing container containing the tools; connection hosts/ports then resolve inside that container.
+Prerequisites: Node 22+, PostgreSQL 17 client tools (`pg_dump`, `pg_restore`, `psql`) and a `game_backup` (or admin) direct or **session-pooler** connection. Transaction pooling is unsuitable for these operations. `PGTOOLS_CONTAINER` optionally names an existing container containing the tools; connection hosts/ports then resolve inside that container.
 
 Create a private key once and keep a second copy somewhere separate from the backup disk:
 
@@ -24,11 +24,11 @@ mkdir -p backups
 umask 077
 openssl rand 32 > /private/path/study-kingdom-backup.key
 export BACKUP_KEY_FILE=/private/path/study-kingdom-backup.key
-export DATABASE_URL='postgresql://ADMIN:SECRET@SESSION-POOLER:5432/postgres'
+export DATABASE_URL='postgresql://game_backup.PROJECT-REF:SECRET@SESSION-POOLER:5432/postgres'
 bash scripts/db/backup.sh
 ```
 
-The script captures one consistent `pg_dump` snapshot of every `game` table plus `auth.users` and `auth.identities`. It streams directly into authenticated AES-256-GCM encryption; no plaintext dump is saved. The key is derived using scrypt with a random salt. Archive headers and contents are authenticated. Failed dumps do not publish an archive, and existing files are never overwritten.
+The script holds one read-only transaction and exports its snapshot. `pg_dump --snapshot` captures every `game` table, and CSV copies of `auth.users` and `auth.identities` (minus generated columns) read the same snapshot, so every account referenced by game rows is present. Everything streams directly into authenticated AES-256-GCM encryption; no plaintext dump is saved. The key is derived using scrypt with a random salt. Archive headers and contents are authenticated. Failed dumps do not publish an archive, and existing files are never overwritten.
 
 Take a backup daily and before migrations. Keep seven daily and four weekly copies, including an encrypted copy off the Mac. Retention is an operator policy; scripts do not silently delete backups. `.github/workflows/backup.yml` provides an optional nightly encrypted backup with seven-day artifact retention once repository secrets are configured.
 
@@ -46,18 +46,18 @@ This is an **application/account-data** backup. Auth sessions, Supabase-managed 
    bash scripts/db/restore.sh backups/study-kingdom-TIMESTAMP.skbak
    ```
 
-4. The script authenticates the whole archive before touching the database, refuses a populated destination, restores within one transaction, and checks the ledger. Reset the recovery `game_api` password and configure username Auth settings using [setup.md](setup.md). Database role passwords are not in the archive.
+4. The script authenticates the whole archive before touching the database, then checks for an empty destination, restores accounts and game rows, and reconciles the ledger in one transaction. Reset the recovery `game_api` password and configure username Auth settings using [setup.md](setup.md). Database role passwords are not in the archive.
 5. In the recovery client, sign in, inspect study history/wallets, replay a stored battle, inspect clan membership and advance an overdue war. Run the ledger query again.
 6. Switch Worker/Auth settings only after these checks. Keep the source database and encrypted archive until the recovered service has been verified.
 
-A local restore drill creates two disposable PostgreSQL databases and checks all game tables, account recovery, ledger reconciliation, tamper rejection and populated-target rejection:
+A local restore drill creates two disposable PostgreSQL databases that mimic hosted Auth (foreign-owned schema, RLS, generated columns), backs up as `game_backup`, and checks all game and account tables, ledger reconciliation, tamper rejection and populated-target rejection:
 
 ```bash
 scripts/test-db.sh up
 PGTOOLS_CONTAINER=sk-test-pg npm run test:backup
 ```
 
-Local and hosted drills passed on 25 October 2026. The hosted drill restored generated local test fixtures into a separate Supabase project: all 25 game/Auth tables matched, all 15 settled replay hashes matched, 46 accounts were preserved, login worked and the ledger reconciled. No production payload was copied.
+Local and hosted drills passed on 25 October 2026. The hosted drill restored generated local test fixtures into a separate Supabase project: all 25 game/Auth tables matched, all 15 settled replay hashes matched, 46 accounts were preserved, login worked and the ledger reconciled. No production payload was copied. That drill dumped with an admin connection, which hid that `game_backup` could not reach `auth` on hosted Supabase; the first nightly run failed with `permission denied for schema auth`. The snapshot export above replaced direct auth reads, and the local drill now runs as `game_backup` under hosted-style Auth privileges. A local Supabase round trip as `game_backup` (69 accounts) restored identical accounts and ledger.
 
 ## Replays and releases
 
@@ -73,6 +73,6 @@ The game is deployed at https://study-kingdom.yuvraj-658.workers.dev. Complete [
 
 Production connects through Hyperdrive with SQL caching disabled, five origin connections and `verify-full` using Supabase’s CA. The bundled public certificate is `scripts/certs/supabase-root-2021.crt` (SHA-256 `807025AD50D4ED219D2C9C7D299C004F824EB00CF7F65AFEF607D07B72E6CAFA`, expires April 2031). Renew the CA configuration before expiry.
 
-The approved `game_backup` role has SELECT access to game tables/sequences and `auth.users`/`auth.identities`, with SELECT-only RLS policies. It cannot mutate wallets. When adding a table, update its backup grants/policy. `pg_dump --enable-row-security` uses those explicit policies. The GitHub backup workflow mounts the public CA and uses `sslmode=verify-full`. The local ignored `study-kingdom-backup.key` must be copied to separate offline storage; losing both copies makes archives unrecoverable.
+The approved `game_backup` role has SELECT access to game tables/sequences with SELECT-only RLS policies, and reads accounts only through the `postgres`-owned `backup_accounts.users()`/`identities()` functions. Hosted Supabase owns the `auth` schema and applies RLS there, so direct grants cannot reach it. The role cannot mutate wallets. When adding a game table, update its backup grants/policy. `pg_dump --enable-row-security` uses those explicit policies. The GitHub backup workflow mounts the public CA and uses `sslmode=verify-full`. The local ignored `study-kingdom-backup.key` must be copied to separate offline storage; losing both copies makes archives unrecoverable.
 
 Forgotten username-account passwords use the owner-only procedure in [setup.md](setup.md). No SMTP or real email addresses are required.
